@@ -188,13 +188,19 @@ https://github.com/richard-gray/subcal
                 subnetmasknumber = parseInt(binarysubnetmask, 2).toString(10) >>> 0
                 subnetslashdropdown.value = subnetlength
                 subnetdotdropdown.value = subnetlength
-                usableaddressesdropdown.value = subnetlength
                 firsthostaddress.innerText = FirstUsableHost(ipaddressnumber, subnetmasknumber)
                 lasthostaddress.innerText = LastUsableHost(ipaddressnumber, subnetmasknumber)
-                networkaddressdiv.innerText = NetworkAddress(ipaddressnumber, subnetmasknumber)
-                broadcastaddress.innerText = BroadcastAddress(ipaddressnumber, subnetmasknumber)
                 if (subnetlength == 30) {
                     usableaddressesdropdown.value = "31"
+                } else {
+                    usableaddressesdropdown.value = subnetlength
+                }
+                if (subnetlength == 31 || subnetlength == 32) {
+                    networkaddressdiv.innerText = "n/a"
+                    broadcastaddress.innerText = "n/a"
+                } else {
+                    networkaddressdiv.innerText = NetworkAddress(ipaddressnumber, subnetmasknumber)
+                    broadcastaddress.innerText = BroadcastAddress(ipaddressnumber, subnetmasknumber)
                 }
             } else {
                 inputvalue.style.background = "#f54242";
@@ -274,10 +280,10 @@ https://github.com/richard-gray/subcal
 
         function FirstUsableHost(ipaddressnumber, subnetmasknumber) {
             switch (subnetmasknumber) {
-                case '4294967294':
+                case 4294967294:
                     firsthost = (ipaddressnumber & subnetmasknumber) >>> 0
                     return ConvertIpNumberToIpAddress(firsthost)
-                case '4294967295':
+                case 4294967295:
                     firsthost = (ipaddressnumber & subnetmasknumber) >>> 0
                     return ConvertIpNumberToIpAddress(firsthost)
                 default:
@@ -295,12 +301,12 @@ https://github.com/richard-gray/subcal
 
         function LastUsableHost(ipaddressnumber, subnetmasknumber) {
             switch (subnetmasknumber) {
-                case '4294967294':
+                case 4294967294:
                     network = (ipaddressnumber & subnetmasknumber) >>> 0
                     invertedsubnetmask = InvertBinary(subnetmasknumber, 32)
                     lasthost = (network | invertedsubnetmask) >>> 0
                     return ConvertIpNumberToIpAddress(lasthost)
-                case '4294967295':
+                case 4294967295:
                     network = (ipaddressnumber & subnetmasknumber) >>> 0
                     invertedsubnetmask = InvertBinary(subnetmasknumber, 32)
                     lasthost = (network | invertedsubnetmask) >>> 0
