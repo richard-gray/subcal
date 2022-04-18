@@ -2,41 +2,82 @@
 Richard Gray
 2022
 @goodgigs
-
-
- -->
-
-<html>
-
-<head>
-    <title>SubCal.io</title>
-    <style>
         @font-face {
             font-family: 'Shippori_Antique_B1';
             src: url('ShipporiAntiqueB1-Regular.ttf') format('truetype');
             font-weight: normal;
             font-style: normal;
         }
-        
+
+ -->
+<html>
+
+<head>
+    <title>SubCal.io</title>
+    <style>
         body {
             background-color: rgb(255, 255, 255);
             margin: 0em;
             padding: 0em;
-            font-family: 'Shippori_Antique_B1', Verdana, sans-serif;
+            font-family: monospace
         }
         
         #page {
             margin: auto;
-            width: 100em;
+            width: 60em;
         }
         
         #nav {
-            color: white;
-            font-size: 5em;
-            font-weight: normal;
             background-color: black;
             padding-left: 0.2em;
             margin-bottom: 0.5em;
+        }
+        
+        #heading1 {
+            color: white;
+            font-size: 5em;
+            font-weight: normal;
+            font-family: monospace;
+            overflow: hidden;
+            white-space: nowrap;
+            letter-spacing: 0em;
+            width: 6em;
+            height: 1.25em;
+            animation: typing 1.5s steps(12, end);
+            display: inline-block;
+        }
+        
+        @keyframes typing {
+            from {
+                width: 0em;
+            }
+            to {
+                width: 6.6em;
+            }
+        }
+        
+        #heading2 {
+            color: white;
+            font-size: 5em;
+            font-weight: normal;
+            font-family: monospace;
+            overflow: hidden;
+            white-space: nowrap;
+            letter-spacing: 0em;
+            width: 6.6em;
+            height: 1.25em;
+            animation: blink-caret .75s step-end infinite;
+            display: inline-block;
+        }
+        
+        @keyframes blink-caret {
+            from,
+            to {
+                width: 0em;
+            }
+            50% {
+                width: 0.6em;
+            }
         }
         
         #footer {
@@ -48,28 +89,98 @@ Richard Gray
             right: 0.1em;
         }
         
-        input,
-        select,
-        .row {
+        table {
             font-size: 2em;
-            font-family: 'Shippori_Antique_B1', Verdana, sans-serif;
+            font-family: monospace;
         }
         
-        .row div {
-            display: inline
+        input {
+            font-size: 1.5em;
+            width: 100%;
+            font-family: monospace;
         }
         
+        input.bounceup {
+            font-size: 1.5em;
+            width: 100%;
+            font-family: monospace;
+            animation: bounceup 0.2s cubic-bezier(.52, -0.37, .47, 1.21)
+        }
+        
+        input.bouncedown {
+            font-size: 1.5em;
+            width: 100%;
+            font-family: monospace;
+            animation: bouncedown 0.2s cubic-bezier(.52, -0.37, .47, 1.21)
+        }
+        
+        input.bounceright {
+            font-size: 1.5em;
+            width: 100%;
+            font-family: monospace;
+            animation: bounceright 0.2s cubic-bezier(.52, -0.37, .47, 1.21)
+        }
+        
+        input.bounceleft {
+            font-size: 1.5em;
+            width: 100%;
+            font-family: monospace;
+            animation: bounceleft 0.2s cubic-bezier(.52, -0.37, .47, 1.21)
+        }
+        
+        @keyframes bounceup {
+            from,
+            to {}
+            50% {
+                transform: translateY(-3px);
+            }
+        }
+        
+        @keyframes bouncedown {
+            from,
+            to {}
+            50% {
+                transform: translateY(3px);
+            }
+        }
+        
+        @keyframes bounceright {
+            from,
+            to {}
+            50% {
+                transform: translateX(3px);
+            }
+        }
+        
+        @keyframes bounceleft {
+            from,
+            to {}
+            50% {
+                transform: translateX(-3px);
+            }
+        }
+        
+        select,
         #hint {
             font-size: 1em;
+            font-family: monospace;
         }
         
         .arrow {
             font-size: 2em;
         }
+        
+        #colspan3 {
+            width: 30em;
+        }
+        
+        #colspan1 {
+            width: 10em;
+        }
     </style>
     <script type="text/javascript">
         function update() {
-            if (!(subnetdropdown.children.length > 0) && !(usableaddressesdropdown.children.length > 0)) {
+            if (!(subnetslashdropdown.children.length > 0) && !(usableaddressesdropdown.children.length > 0)) {
                 GenerateDropdowns()
             }
             validation = ValidateIPaddress(inputvalue.value)
@@ -80,12 +191,14 @@ Richard Gray
                 ipaddressnumber = parseInt(binaryipaddress, 2).toString(10)
                 subnetlength = inputvalue.value.split("/")[1]
                 binarysubnetmask = ConvertSubnetToBinary(subnetlength)
-                subnetmasknumber = parseInt(binarysubnetmask, 2).toString(10)
-                subnetdropdown.value = subnetlength
+                subnetmasknumber = parseInt(binarysubnetmask, 2).toString(10) >>> 0
+                subnetslashdropdown.value = subnetlength
+                subnetdotdropdown.value = subnetlength
                 usableaddressesdropdown.value = subnetlength
                 firsthostaddress.innerText = FirstUsableHost(ipaddressnumber, subnetmasknumber)
                 lasthostaddress.innerText = LastUsableHost(ipaddressnumber, subnetmasknumber)
-                usableaddresses.innerText = UsableAddresses(subnetlength)
+                    // subnetmask.innerText = ConvertIpNumberToIpAddress(subnetmasknumber)
+                    // usableaddresses.innerText = UsableAddresses(subnetlength)
                 networkaddressdiv.innerText = NetworkAddress(ipaddressnumber, subnetmasknumber)
                 broadcastaddress.innerText = BroadcastAddress(ipaddressnumber, subnetmasknumber)
             } else {
@@ -93,13 +206,26 @@ Richard Gray
             }
         }
 
-        function updatedropdown() {
-            inputtemp = inputvalue.value.split("/")[0] + "/" + subnetdropdown.value
+        function updatesubnetslashdropdown() {
+            inputtemp = inputvalue.value.split("/")[0] + "/" + subnetslashdropdown.value
             validation = ValidateIPaddress(inputtemp)
             if (validation[0] && validation[1]) {
                 inputvalue.style.background = "";
                 inputvalue.value = inputtemp
-                subnetdropdown.value = inputvalue.value.split("/")[1]
+                subnetslashdropdown.value = inputvalue.value.split("/")[1]
+                update()
+            } else {
+                inputvalue.style.background = "#f54242";
+            }
+        }
+
+        function updatesubnetdotdropdown() {
+            inputtemp = inputvalue.value.split("/")[0] + "/" + subnetdotdropdown.value
+            validation = ValidateIPaddress(inputtemp)
+            if (validation[0] && validation[1]) {
+                inputvalue.style.background = "";
+                inputvalue.value = inputtemp
+                subnetdotdropdown.value = inputvalue.value.split("/")[1]
                 update()
             } else {
                 inputvalue.style.background = "#f54242";
@@ -221,24 +347,43 @@ Richard Gray
         }
 
         function GenerateDropdowns() {
-            var subnetdropdownoption = []
+            var subnetslashdropdownoption = []
+            var subnetdotdropdownoption = []
             var usableaddressesdropdownoption = []
             for (x = 32; x > 0; x--) {
                 y = 33 - x
-                subnetdropdownoption[x] = document.createElement("option")
+                subnetslashdropdownoption[x] = document.createElement("option")
+                subnetdotdropdownoption[x] = document.createElement("option")
                 usableaddressesdropdownoption[x] = document.createElement("option")
-                subnetdropdownoption[x].value = x.toString()
-                subnetdropdownoption[x].text = "/" + x.toString()
+                subnetslashdropdownoption[x].value = x.toString()
+                subnetslashdropdownoption[x].text = "/" + x.toString()
+                subnetdotdropdownoption[x].value = x.toString()
+                subnetdotdropdownoption[x].text = ConvertIpNumberToIpAddress(parseInt(ConvertSubnetToBinary(x), 2).toString(10) >>> 0)
                 usableaddressesdropdownoption[x].value = x.toString()
                 usableaddressesdropdownoption[x].text = UsableAddresses((33 - y).toString())
-                subnetdropdown.add(subnetdropdownoption[x])
+                subnetslashdropdown.add(subnetslashdropdownoption[x])
+                subnetdotdropdown.add(subnetdotdropdownoption[x])
                 usableaddressesdropdown.add(usableaddressesdropdownoption[x])
             }
         }
 
+
+
         document.onkeydown = function(e) {
             switch (e.keyCode) {
                 case 40:
+                    if (inputvalue.classList.value.includes("bounceup")) {
+                        inputvalue.classList.remove("bounceup")
+                    }
+                    if (inputvalue.classList.value.includes("bouncedown")) {
+                        inputvalue.classList.remove("bouncedown")
+                    }
+                    if (inputvalue.classList.value.includes("bounceright")) {
+                        inputvalue.classList.remove("bounceright")
+                    }
+                    if (inputvalue.classList.value.includes("bounceleft")) {
+                        inputvalue.classList.remove("bounceleft")
+                    }
                     ipaddress = inputvalue.value.split("/")[0]
                     binaryipaddress = ConvertIpToBinary(ipaddress)
                     ipaddressnumber = parseInt(binaryipaddress, 2).toString(10)
@@ -249,14 +394,42 @@ Richard Gray
                     nextnetworkaddress = (ipaddressnumber >>> 0) - (InvertBinary(subnetmasknumber, 32) >>> 0)
                     inputvalue.value = NetworkAddress(nextnetworkaddress, subnetmasknumber) + "/" + subnetlength
                     update()
+                    void inputvalue.offsetWidth;
+                    inputvalue.classList.add("bouncedown")
                     break;
                 case 39:
                     if (document.activeElement.id != "inputvalue") {
+                        if (inputvalue.classList.value.includes("bounceup")) {
+                            inputvalue.classList.remove("bounceup")
+                        }
+                        if (inputvalue.classList.value.includes("bouncedown")) {
+                            inputvalue.classList.remove("bouncedown")
+                        }
+                        if (inputvalue.classList.value.includes("bounceright")) {
+                            inputvalue.classList.remove("bounceright")
+                        }
+                        if (inputvalue.classList.value.includes("bounceleft")) {
+                            inputvalue.classList.remove("bounceleft")
+                        }
                         inputvalue.value = inputvalue.value.split("/")[0] + "/" + (parseInt(inputvalue.value.split("/")[1], 10) + 1)
                         update()
+                        void inputvalue.offsetWidth;
+                        inputvalue.classList.add("bounceright")
                     }
                     break;
                 case 38:
+                    if (inputvalue.classList.value.includes("bounceup")) {
+                        inputvalue.classList.remove("bounceup")
+                    }
+                    if (inputvalue.classList.value.includes("bouncedown")) {
+                        inputvalue.classList.remove("bouncedown")
+                    }
+                    if (inputvalue.classList.value.includes("bounceright")) {
+                        inputvalue.classList.remove("bounceright")
+                    }
+                    if (inputvalue.classList.value.includes("bounceleft")) {
+                        inputvalue.classList.remove("bounceleft")
+                    }
                     ipaddress = inputvalue.value.split("/")[0]
                     binaryipaddress = ConvertIpToBinary(ipaddress)
                     ipaddressnumber = parseInt(binaryipaddress, 2).toString(10)
@@ -267,11 +440,28 @@ Richard Gray
                     nextnetworkaddress = (ipaddressnumber >>> 0) + ((InvertBinary(subnetmasknumber, 32) >>> 0) + 1)
                     inputvalue.value = NetworkAddress(nextnetworkaddress, subnetmasknumber) + "/" + subnetlength
                     update()
+                    void inputvalue.offsetWidth;
+                    inputvalue.classList.add("bounceup")
                     break;
                 case 37:
+
                     if (document.activeElement.id != "inputvalue") {
+                        if (inputvalue.classList.value.includes("bounceup")) {
+                            inputvalue.classList.remove("bounceup")
+                        }
+                        if (inputvalue.classList.value.includes("bouncedown")) {
+                            inputvalue.classList.remove("bouncedown")
+                        }
+                        if (inputvalue.classList.value.includes("bounceright")) {
+                            inputvalue.classList.remove("bounceright")
+                        }
+                        if (inputvalue.classList.value.includes("bounceleft")) {
+                            inputvalue.classList.remove("bounceleft")
+                        }
                         inputvalue.value = inputvalue.value.split("/")[0] + "/" + (parseInt(inputvalue.value.split("/")[1], 10) - 1)
                         update()
+                        void inputvalue.offsetWidth;
+                        inputvalue.classList.add("bounceleft")
                     }
                     break;
             }
@@ -282,35 +472,75 @@ Richard Gray
 
 <body onload="update()">
     <div id='page'>
-        <div id='nav'>subcal.io >_</div>
-        <div id='calculator'>
-            <input id="inputvalue" type="text" value="192.168.0.0/24" onchange="update()" oninput="update()"></input>
-            <select id="subnetdropdown" onchange="updatedropdown()" oninput="updatedropdown()"></select>
-            <select id="usableaddressesdropdown" onchange="updateusableaddressesdropdown()" oninput="updateusableaddressesdropdown()">
-            </select>
-            <div class="row">
-                <div class="heading">First Host:</div>
-                <div id="firsthostaddress"></div>
-            </div>
-            <div class="row">
-                <div class="heading">Last Host:</div>
-                <div id="lasthostaddress"></div>
-            </div>
-            <div class="row">
-                <div class="heading">Usable Addresses:</div>
-                <div id="usableaddresses"></div>
-            </div>
-            <div class="row">
-                <div class="heading">Network Address:</div>
-                <div class="item" id="networkaddressdiv"></div>
-            </div>
-            <div class="row">
-                <div class="heading">Broadcast Address:</div>
-                <div class="item" id="broadcastaddress"></div>
-            </div>
+        <div id='nav'>
+            <div id="heading1">subcal.io ></div>
+            <div id="heading2">_</div>
         </div>
-        <div id='hint'>Tip try using the arrow keys</div>
-        <div id='footer'>subcal.io</div>
+        <div id='calculator'>
+            <table>
+                <tr>
+                    <td colspan="3" id="colspan3">
+                        <input id="inputvalue" type="text" value="192.168.0.0/24" onchange="update()" oninput="update()"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td id="colspan1">
+                        <div class="heading">Host Range</div>
+                    </td>
+                    <td id="colspan1">
+                        <div id="firsthostaddress"></div>
+                    </td>
+                    <td id="colspan1">
+                        <div id="lasthostaddress"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="heading">Subnet Mask</div>
+                    </td>
+                    <td>
+                        <!-- <div id="subnetmask"></div> -->
+                        <select id="subnetslashdropdown" onchange="updatesubnetslashdropdown()" oninput="updatesubnetslashdropdown()"></select>
+                    </td>
+                    <td>
+                        <select id="subnetdotdropdown" onchange="updatesubnetdotdropdown()" oninput="updatesubnetdotdropdown()"></select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="heading">Usable Addresses</div>
+                    </td>
+                    <td>
+                        <!-- <div id="usableaddresses"></div> -->
+                        <select id="usableaddressesdropdown" onchange="updateusableaddressesdropdown()" oninput="updateusableaddressesdropdown()"></select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="heading">Network Address</div>
+                    </td>
+                    <td>
+                        <div class="item" id="networkaddressdiv"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="heading">Broadcast Address</div>
+                    </td>
+                    <td>
+                        <div class="item" id="broadcastaddress"></div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="words"><br>This is a subnet calculator I wrote after years of frustration using others online.<br> My goals for this project:<br> 1. ease of use<br> 2. fast<br> 3. no dependancys on backend server or libraries<br> 4. lots of features<br>5. remembers
+            state
+            <br> 6. learn something
+            <br><br><br>
+        </div>
+        <div id="github">Please contribute! https://github.com/richard-gray/subcal</div>
+        <div id='hint'>*Tip try using the arrow keys*</div>
+        <div id='footer'>Richard Gray @goodgigs subcal.io</div>
     </div>
 </body>
 
