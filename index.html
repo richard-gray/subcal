@@ -2,13 +2,7 @@
 Richard Gray
 2022
 @goodgigs
-        @font-face {
-            font-family: 'Shippori_Antique_B1';
-            src: url('ShipporiAntiqueB1-Regular.ttf') format('truetype');
-            font-weight: normal;
-            font-style: normal;
-        }
-
+https://github.com/richard-gray/subcal
  -->
 <html>
 
@@ -197,10 +191,11 @@ Richard Gray
                 usableaddressesdropdown.value = subnetlength
                 firsthostaddress.innerText = FirstUsableHost(ipaddressnumber, subnetmasknumber)
                 lasthostaddress.innerText = LastUsableHost(ipaddressnumber, subnetmasknumber)
-                    // subnetmask.innerText = ConvertIpNumberToIpAddress(subnetmasknumber)
-                    // usableaddresses.innerText = UsableAddresses(subnetlength)
                 networkaddressdiv.innerText = NetworkAddress(ipaddressnumber, subnetmasknumber)
                 broadcastaddress.innerText = BroadcastAddress(ipaddressnumber, subnetmasknumber)
+                if (subnetlength == 30) {
+                    usableaddressesdropdown.value = "31"
+                }
             } else {
                 inputvalue.style.background = "#f54242";
             }
@@ -353,17 +348,21 @@ Richard Gray
             for (x = 32; x > 0; x--) {
                 y = 33 - x
                 subnetslashdropdownoption[x] = document.createElement("option")
-                subnetdotdropdownoption[x] = document.createElement("option")
-                usableaddressesdropdownoption[x] = document.createElement("option")
                 subnetslashdropdownoption[x].value = x.toString()
                 subnetslashdropdownoption[x].text = "/" + x.toString()
+                subnetslashdropdown.add(subnetslashdropdownoption[x])
+
+                subnetdotdropdownoption[x] = document.createElement("option")
                 subnetdotdropdownoption[x].value = x.toString()
                 subnetdotdropdownoption[x].text = ConvertIpNumberToIpAddress(parseInt(ConvertSubnetToBinary(x), 2).toString(10) >>> 0)
-                usableaddressesdropdownoption[x].value = x.toString()
-                usableaddressesdropdownoption[x].text = UsableAddresses((33 - y).toString())
-                subnetslashdropdown.add(subnetslashdropdownoption[x])
                 subnetdotdropdown.add(subnetdotdropdownoption[x])
-                usableaddressesdropdown.add(usableaddressesdropdownoption[x])
+
+                if (x != 30) {
+                    usableaddressesdropdownoption[x] = document.createElement("option")
+                    usableaddressesdropdownoption[x].value = x.toString()
+                    usableaddressesdropdownoption[x].text = UsableAddresses((33 - y).toString())
+                    usableaddressesdropdown.add(usableaddressesdropdownoption[x])
+                }
             }
         }
 
