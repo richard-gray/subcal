@@ -245,7 +245,6 @@ https://github.com/richard-gray/subcal
             }
         }
 
-
         function ValidateIPaddress(ipaddress) {
 
             var ip, subnet = false
@@ -279,16 +278,11 @@ https://github.com/richard-gray/subcal
         }
 
         function FirstUsableHost(ipaddressnumber, subnetmasknumber) {
-            switch (subnetmasknumber) {
-                case 4294967294:
-                    firsthost = (ipaddressnumber & subnetmasknumber) >>> 0
-                    return ConvertIpNumberToIpAddress(firsthost)
-                case 4294967295:
-                    firsthost = (ipaddressnumber & subnetmasknumber) >>> 0
-                    return ConvertIpNumberToIpAddress(firsthost)
-                default:
-                    firsthost = ((ipaddressnumber & subnetmasknumber) + 1) >>> 0
-                    return ConvertIpNumberToIpAddress(firsthost)
+            firsthost = (ipaddressnumber & subnetmasknumber) >>> 0
+            if (subnetmasknumber == 4294967294 || subnetmasknumber == 4294967295) {
+                return ConvertIpNumberToIpAddress(firsthost)
+            } else {
+                return ConvertIpNumberToIpAddress(firsthost + 1)
             }
         }
 
@@ -300,22 +294,13 @@ https://github.com/richard-gray/subcal
         }
 
         function LastUsableHost(ipaddressnumber, subnetmasknumber) {
-            switch (subnetmasknumber) {
-                case 4294967294:
-                    network = (ipaddressnumber & subnetmasknumber) >>> 0
-                    invertedsubnetmask = InvertBinary(subnetmasknumber, 32)
-                    lasthost = (network | invertedsubnetmask) >>> 0
-                    return ConvertIpNumberToIpAddress(lasthost)
-                case 4294967295:
-                    network = (ipaddressnumber & subnetmasknumber) >>> 0
-                    invertedsubnetmask = InvertBinary(subnetmasknumber, 32)
-                    lasthost = (network | invertedsubnetmask) >>> 0
-                    return ConvertIpNumberToIpAddress(lasthost)
-                default:
-                    network = (ipaddressnumber & subnetmasknumber) >>> 0
-                    invertedsubnetmask = InvertBinary(subnetmasknumber, 32)
-                    lasthost = ((network | invertedsubnetmask) - 1) >>> 0
-                    return ConvertIpNumberToIpAddress(lasthost)
+            network = (ipaddressnumber & subnetmasknumber) >>> 0
+            invertedsubnetmask = InvertBinary(subnetmasknumber, 32)
+            lasthost = (network | invertedsubnetmask) >>> 0
+            if (subnetmasknumber == 4294967294 || subnetmasknumber == 4294967295) {
+                return ConvertIpNumberToIpAddress(lasthost)
+            } else {
+                return ConvertIpNumberToIpAddress(lasthost - 1)
             }
         }
 
@@ -328,7 +313,6 @@ https://github.com/richard-gray/subcal
                 default:
                     return ((2 ** (32 - subnetlength)) - 2);
             }
-
         }
 
         function ConvertToByte(number) {
@@ -357,12 +341,10 @@ https://github.com/richard-gray/subcal
                 subnetslashdropdownoption[x].value = x.toString()
                 subnetslashdropdownoption[x].text = "/" + x.toString()
                 subnetslashdropdown.add(subnetslashdropdownoption[x])
-
                 subnetdotdropdownoption[x] = document.createElement("option")
                 subnetdotdropdownoption[x].value = x.toString()
                 subnetdotdropdownoption[x].text = ConvertIpNumberToIpAddress(parseInt(ConvertSubnetToBinary(x), 2).toString(10) >>> 0)
                 subnetdotdropdown.add(subnetdotdropdownoption[x])
-
                 if (x != 30) {
                     usableaddressesdropdownoption[x] = document.createElement("option")
                     usableaddressesdropdownoption[x].value = x.toString()
@@ -372,23 +354,21 @@ https://github.com/richard-gray/subcal
             }
         }
 
-
-
         document.onkeydown = function(e) {
+            if (inputvalue.classList.value.includes("bounceup")) {
+                inputvalue.classList.remove("bounceup")
+            }
+            if (inputvalue.classList.value.includes("bouncedown")) {
+                inputvalue.classList.remove("bouncedown")
+            }
+            if (inputvalue.classList.value.includes("bounceright")) {
+                inputvalue.classList.remove("bounceright")
+            }
+            if (inputvalue.classList.value.includes("bounceleft")) {
+                inputvalue.classList.remove("bounceleft")
+            }
             switch (e.keyCode) {
                 case 40:
-                    if (inputvalue.classList.value.includes("bounceup")) {
-                        inputvalue.classList.remove("bounceup")
-                    }
-                    if (inputvalue.classList.value.includes("bouncedown")) {
-                        inputvalue.classList.remove("bouncedown")
-                    }
-                    if (inputvalue.classList.value.includes("bounceright")) {
-                        inputvalue.classList.remove("bounceright")
-                    }
-                    if (inputvalue.classList.value.includes("bounceleft")) {
-                        inputvalue.classList.remove("bounceleft")
-                    }
                     ipaddress = inputvalue.value.split("/")[0]
                     binaryipaddress = ConvertIpToBinary(ipaddress)
                     ipaddressnumber = parseInt(binaryipaddress, 2).toString(10)
@@ -404,18 +384,6 @@ https://github.com/richard-gray/subcal
                     break;
                 case 39:
                     if (document.activeElement.id != "inputvalue") {
-                        if (inputvalue.classList.value.includes("bounceup")) {
-                            inputvalue.classList.remove("bounceup")
-                        }
-                        if (inputvalue.classList.value.includes("bouncedown")) {
-                            inputvalue.classList.remove("bouncedown")
-                        }
-                        if (inputvalue.classList.value.includes("bounceright")) {
-                            inputvalue.classList.remove("bounceright")
-                        }
-                        if (inputvalue.classList.value.includes("bounceleft")) {
-                            inputvalue.classList.remove("bounceleft")
-                        }
                         inputvalue.value = inputvalue.value.split("/")[0] + "/" + (parseInt(inputvalue.value.split("/")[1], 10) + 1)
                         update()
                         void inputvalue.offsetWidth;
@@ -423,18 +391,6 @@ https://github.com/richard-gray/subcal
                     }
                     break;
                 case 38:
-                    if (inputvalue.classList.value.includes("bounceup")) {
-                        inputvalue.classList.remove("bounceup")
-                    }
-                    if (inputvalue.classList.value.includes("bouncedown")) {
-                        inputvalue.classList.remove("bouncedown")
-                    }
-                    if (inputvalue.classList.value.includes("bounceright")) {
-                        inputvalue.classList.remove("bounceright")
-                    }
-                    if (inputvalue.classList.value.includes("bounceleft")) {
-                        inputvalue.classList.remove("bounceleft")
-                    }
                     ipaddress = inputvalue.value.split("/")[0]
                     binaryipaddress = ConvertIpToBinary(ipaddress)
                     ipaddressnumber = parseInt(binaryipaddress, 2).toString(10)
@@ -451,18 +407,6 @@ https://github.com/richard-gray/subcal
                 case 37:
 
                     if (document.activeElement.id != "inputvalue") {
-                        if (inputvalue.classList.value.includes("bounceup")) {
-                            inputvalue.classList.remove("bounceup")
-                        }
-                        if (inputvalue.classList.value.includes("bouncedown")) {
-                            inputvalue.classList.remove("bouncedown")
-                        }
-                        if (inputvalue.classList.value.includes("bounceright")) {
-                            inputvalue.classList.remove("bounceright")
-                        }
-                        if (inputvalue.classList.value.includes("bounceleft")) {
-                            inputvalue.classList.remove("bounceleft")
-                        }
                         inputvalue.value = inputvalue.value.split("/")[0] + "/" + (parseInt(inputvalue.value.split("/")[1], 10) - 1)
                         update()
                         void inputvalue.offsetWidth;
@@ -541,9 +485,8 @@ https://github.com/richard-gray/subcal
         <div id="words"><br>This is a subnet calculator I wrote after years of frustration using others online.<br> My goals for this project:<br> 1. ease of use<br> 2. fast<br> 3. no dependancys on backend server or libraries<br> 4. lots of features<br>5. remembers
             state
             <br> 6. learn something
-            <br><br><br>
+            <br><br>Please contribute! https://github.com/richard-gray/subcal<br>
         </div>
-        <div id="github">Please contribute! https://github.com/richard-gray/subcal</div>
         <div id='hint'>*Tip try using the arrow keys*</div>
         <div id='footer'>Richard Gray @goodgigs subcal.io</div>
     </div>
