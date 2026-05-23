@@ -14,134 +14,146 @@ https://github.com/richard-gray/subcal
     <meta name="theme-color" content="#000000">
     <title>SubCal.io &mdash; subnet calculator</title>
     <style>
+        /* ----- Design tokens ----- */
         :root {
             --bg: #ffffff;
-            --fg: #000000;
-            --nav-bg: #000000;
-            --nav-fg: #ffffff;
-            --hover-bg: #f0f0f0;
+            --fg: #111111;
+            --muted: #6b7280;
+            --border: #e2e4e8;
+            --hover-bg: #eef0f3;
             --copied-bg: #b6f5b6;
             --error-bg: #f54242;
-            --muted: #888;
-            --border: #ddd;
             --link: #0066cc;
-            --net-bit: #1853b8;
-            --host-bit: #999;
-            --panel-bg: #fafafa;
+            --nav-bg: #000000;
+            --nav-fg: #ffffff;
+            --panel-bg: #f7f8fa;
         }
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg: #0d0d0d;
                 --fg: #e8e8e8;
-                --nav-bg: #1a1a1a;
-                --nav-fg: #f0f0f0;
-                --hover-bg: #2a2a2a;
+                --muted: #7c8493;
+                --border: #2a2a2a;
+                --hover-bg: #1c1c1c;
                 --copied-bg: #2a6b2a;
                 --error-bg: #7a2828;
-                --muted: #666;
-                --border: #333;
                 --link: #6aa6ff;
-                --net-bit: #7fb1ff;
-                --host-bit: #888;
+                --nav-bg: #1a1a1a;
+                --nav-fg: #f0f0f0;
                 --panel-bg: #161616;
             }
         }
 
+        /* ----- Resets ----- */
+        *, *::before, *::after { box-sizing: border-box; }
         body {
-            background-color: var(--bg);
-            color: var(--fg);
             margin: 0;
-            padding: 0;
-            font-family: monospace;
+            background: var(--bg);
+            color: var(--fg);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 16px;
+            line-height: 1.45;
+        }
+        a { color: var(--link); }
+
+        code, kbd {
+            font-family: inherit;
+            font-size: 0.92em;
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 0.05em 0.4em;
+            color: var(--fg);
         }
 
         #page {
             max-width: 60em;
-            width: 100%;
             margin: 0 auto;
-            padding: 0 0.5em 4em;
-            box-sizing: border-box;
+            padding: 0 1em 2em;
         }
 
+        /* ----- Header (kept iconic, slightly tightened) ----- */
         #nav {
-            background-color: var(--nav-bg);
-            padding-left: 0.2em;
-            margin: 0 -0.5em 0.5em;
+            background: var(--nav-bg);
+            margin: 0 -1em 1.5em;
+            padding-left: 0.4em;
+            white-space: nowrap;
+            overflow: hidden;
         }
-
         #heading1, #heading2 {
             color: var(--nav-fg);
             font-size: 5em;
             font-weight: normal;
-            font-family: monospace;
-            overflow: hidden;
+            font-family: inherit;
             white-space: nowrap;
-            letter-spacing: 0;
+            overflow: hidden;
             height: 1.25em;
             display: inline-block;
             vertical-align: top;
         }
-
-        #heading1 {
-            width: 6em;
-            animation: typing 1.5s steps(12, end);
-        }
-        #heading2 {
-            width: 6.6em;
-            animation: blink-caret .75s step-end infinite;
-        }
-
+        #heading1 { width: 6em; animation: typing 1.5s steps(12, end); }
+        #heading2 { width: 6.6em; animation: blink-caret .75s step-end infinite; }
         @keyframes typing { from { width: 0; } to { width: 6.6em; } }
         @keyframes blink-caret { from, to { width: 0; } 50% { width: 0.6em; } }
-
-        @media (max-width: 480px) {
-            #heading1, #heading2 { font-size: 2.5em; }
-            #heading1 { width: 6em; }
-            #heading2 { width: 6.6em; }
-        }
-
-        table {
-            font-size: 2em;
-            font-family: monospace;
-            width: 100%;
-            border-collapse: collapse;
-        }
-        td { padding: 0.05em 0.1em; vertical-align: middle; }
-
         @media (max-width: 600px) {
-            table { font-size: 1.4em; }
+            #heading1, #heading2 { font-size: 3em; }
         }
 
-        input, select {
-            font-family: monospace;
+        /* ----- Calculator: label / value rows ----- */
+        table.calc { width: 100%; border-collapse: collapse; }
+        table.calc td {
+            padding: 0.25em 0.4em;
+            vertical-align: middle;
+        }
+        table.calc td.label {
+            color: var(--muted);
+            text-align: right;
+            width: 12em;
+            font-size: 1em;
+            padding-right: 0.75em;
+        }
+        table.calc td.value {
+            font-size: 1.5em;
+        }
+
+        /* Address input row */
+        #inputvalue {
+            width: 100%;
+            font-family: inherit;
+            font-size: 1.5em;
+            padding: 0.25em 0.4em;
+            border: 1px solid var(--border);
+            border-radius: 3px;
             background: var(--bg);
             color: var(--fg);
-            border: 1px solid var(--border);
         }
-        input {
-            font-size: 1.5em;
-            width: 100%;
-            box-sizing: border-box;
-            padding: 0.1em 0.2em;
-        }
-        select {
-            font-size: 1em;
-            padding: 0.1em;
-        }
+        #inputvalue:focus { outline: 2px solid var(--link); outline-offset: -1px; }
+        #inputvalue::placeholder { color: var(--muted); opacity: 1; }
 
-        input.bounceup    { animation: bounceup    0.2s cubic-bezier(.52, -0.37, .47, 1.21); }
-        input.bouncedown  { animation: bouncedown  0.2s cubic-bezier(.52, -0.37, .47, 1.21); }
-        input.bounceright { animation: bounceright 0.2s cubic-bezier(.52, -0.37, .47, 1.21); }
-        input.bounceleft  { animation: bounceleft  0.2s cubic-bezier(.52, -0.37, .47, 1.21); }
+        /* Selects inherit their parent's font-size (so a select in a
+           td.value renders at 1.5em, in the vlsm-header at 1em). */
+        select {
+            font-family: inherit;
+            font-size: 1em;
+            padding: 0.1em 0.3em;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            background: var(--bg);
+            color: var(--fg);
+        }
+        select:focus { outline: 2px solid var(--link); outline-offset: -1px; }
+
+        /* Bounce animations on input */
+        input.bounceup    { animation: bounceup    0.2s cubic-bezier(.52,-0.37,.47,1.21); }
+        input.bouncedown  { animation: bouncedown  0.2s cubic-bezier(.52,-0.37,.47,1.21); }
+        input.bounceright { animation: bounceright 0.2s cubic-bezier(.52,-0.37,.47,1.21); }
+        input.bounceleft  { animation: bounceleft  0.2s cubic-bezier(.52,-0.37,.47,1.21); }
         @keyframes bounceup    { from, to {} 50% { transform: translateY(-3px); } }
         @keyframes bouncedown  { from, to {} 50% { transform: translateY( 3px); } }
         @keyframes bounceright { from, to {} 50% { transform: translateX( 3px); } }
         @keyframes bounceleft  { from, to {} 50% { transform: translateX(-3px); } }
 
-        .span3 { width: 30em; max-width: 100%; }
-        .span1 { width: 10em; }
-
-        /* Mode-based row visibility */
+        /* Mode visibility */
         .v4-only { display: table-row; }
         .v6-only { display: none; }
         body.v6 .v4-only { display: none; }
@@ -151,107 +163,83 @@ https://github.com/richard-gray/subcal
         body.v6 td.v4-only { display: none; }
         body.v6 td.v6-only { display: table-cell; }
 
-        .mode-tag {
-            display: inline-block;
-            font-size: 0.5em;
-            padding: 0.05em 0.4em;
-            border-radius: 3px;
-            background: var(--panel-bg);
-            border: 1px solid var(--border);
-            color: var(--muted);
-            vertical-align: middle;
-            margin-left: 0.3em;
-        }
-
+        /* ----- Copyable interactive values ----- */
         .copyable {
             cursor: pointer;
             user-select: all;
-            border-radius: 2px;
-            padding: 0 0.15em;
-            transition: background-color 0.15s;
-            display: inline-block;
-            min-width: 1em;
+            text-decoration: underline dotted var(--muted);
+            text-underline-offset: 0.2em;
+            text-decoration-thickness: 1px;
+            padding: 0.05em 0.2em;
+            border-radius: 3px;
+            transition: background-color 0.15s, text-decoration-color 0.15s;
         }
-        .copyable:hover { background-color: var(--hover-bg); }
-        .copyable.copied { background-color: var(--copied-bg); }
-        .copyable.na { cursor: default; user-select: none; color: var(--muted); }
-        .copyable.na:hover { background-color: transparent; }
+        .copyable:hover {
+            background: var(--hover-bg);
+            text-decoration-style: solid;
+            text-decoration-color: var(--fg);
+        }
+        .copyable.copied {
+            background: var(--copied-bg);
+            text-decoration-color: transparent;
+        }
+        .copyable.na {
+            text-decoration: none;
+            cursor: default;
+            user-select: none;
+            color: var(--muted);
+        }
+        .copyable.na:hover { background: transparent; }
 
-        #binaryrow td { padding-top: 0.3em; }
+        /* Binary view — same size as other values; scrolls if needed. */
         .binary {
-            font-size: 0.7em;
-            letter-spacing: 0.05em;
+            font-size: 1em;
+            letter-spacing: 0.04em;
             white-space: nowrap;
             overflow-x: auto;
             display: inline-block;
             max-width: 100%;
         }
-        .binary .net  { color: var(--net-bit); font-weight: bold; }
-        .binary .host { color: var(--host-bit); }
+        .binary .net  { color: var(--fg); }
+        .binary .host { color: var(--muted); }
         .binary .sep  { color: var(--muted); }
 
-        #vlsm {
-            margin-top: 1.5em;
-            border-top: 1px solid var(--border);
-            padding-top: 0.5em;
-        }
-        #vlsm h2 {
-            font-size: 1em;
-            margin: 0 0 0.3em;
-            color: var(--muted);
-            font-weight: normal;
-        }
-        #vlsm-controls { font-size: 1em; margin-bottom: 0.5em; }
-        #vlsm-controls select { font-size: 1em; }
-        #vlsm-list {
-            font-size: 0.95em;
-            max-height: 16em;
-            overflow-y: auto;
-            border: 1px solid var(--border);
-            background: var(--panel-bg);
-            padding: 0.25em;
-            display: none;
-        }
-        #vlsm-list.shown { display: block; }
-        .vlsm-row {
-            display: grid;
-            grid-template-columns: 14em 1fr;
-            gap: 0.5em;
-            padding: 0.1em 0.2em;
-        }
-        .vlsm-row:hover { background: var(--hover-bg); }
-        .vlsm-cidr { font-weight: bold; }
-        .vlsm-range { color: var(--muted); }
-        #vlsm-count { color: var(--muted); margin-left: 0.5em; }
-
-        #hint {
-            font-size: 1em;
-            font-family: monospace;
-            margin-top: 0.5em;
-            color: var(--muted);
-        }
-        #words { font-size: 1em; }
-        a { color: var(--link); }
-
-        #footer {
+        /* ----- VLSM list (rows in the same table) ----- */
+        .vlsm-status {
             color: var(--muted);
             font-size: 0.85em;
-            position: fixed;
-            bottom: 0.3em;
-            right: 0.5em;
+            padding: 0.1em 0.4em;
+        }
+        #vlsm-status.hide { display: none; }
+        tbody#vlsm-list tr:hover { background: var(--hover-bg); }
+        td.vlsm-range { color: var(--muted); }
+
+        /* ----- Hint + words + footer ----- */
+        #hint, #words {
+            margin-top: 1.25em;
+            color: var(--muted);
+            font-size: 1em;
+        }
+        #footer {
+            margin-top: 2em;
+            padding-top: 0.75em;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.85em;
+            text-align: right;
         }
 
+        /* ----- Toast ----- */
         #toast {
             position: fixed;
             bottom: 1.5em;
             left: 50%;
             transform: translateX(-50%) translateY(2em);
-            background: #222;
-            color: #fff;
+            background: var(--fg);
+            color: var(--bg);
             padding: 0.5em 1em;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 0.9em;
+            border-radius: 3px;
+            font-size: 1em;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.15s, transform 0.15s;
@@ -262,6 +250,7 @@ https://github.com/richard-gray/subcal
             transform: translateX(-50%) translateY(0);
         }
 
+        /* ----- Help overlay ----- */
         #help-overlay {
             position: fixed;
             inset: 0;
@@ -276,26 +265,24 @@ https://github.com/richard-gray/subcal
             background: var(--bg);
             color: var(--fg);
             border: 1px solid var(--border);
-            padding: 1em 1.5em;
-            font-family: monospace;
-            max-width: 30em;
-            width: 90%;
-            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            padding: 1.5em;
+            max-width: 32em;
+            width: calc(100% - 2em);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
         }
-        #help-panel h2 { margin: 0 0 0.5em; font-size: 1.2em; }
-        #help-panel table { font-size: 0.95em; }
-        #help-panel td { padding: 0.15em 0.5em; }
-        #help-panel kbd {
-            background: var(--panel-bg);
-            border: 1px solid var(--border);
-            border-radius: 3px;
-            padding: 0.05em 0.4em;
-            font-family: monospace;
-            font-size: 0.95em;
-            color: var(--fg);
+        #help-panel h2 {
+            margin: 0 0 0.75em;
+            font-size: 1.15em;
+            font-weight: normal;
+            color: var(--muted);
         }
+        #help-panel table { width: 100%; border-collapse: collapse; }
+        #help-panel td { padding: 0.2em 0.5em; vertical-align: top; }
+        #help-panel td:first-child { white-space: nowrap; width: 9em; }
+        #help-panel td:last-child { color: var(--muted); }
         #help-close {
-            margin-top: 1em;
+            margin-top: 1.2em;
             font-size: 0.85em;
             color: var(--muted);
         }
@@ -307,75 +294,78 @@ https://github.com/richard-gray/subcal
         <div id='nav'>
             <div id="heading1">subcal.io &gt;</div><div id="heading2">_</div>
         </div>
-        <div id='calculator'>
-            <table>
+        <div>
+            <table class="calc">
+                <tbody>
                 <tr>
-                    <td colspan="3" class="span3">
-                        <input id="inputvalue" type="text" value="192.168.0.0/24" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" aria-label="IP address with CIDR prefix">
+                    <td colspan="3">
+                        <input id="inputvalue" type="text" value="192.168.0.0/24" placeholder="enter an IPv4 or IPv6 network and prefix" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" aria-label="IP address with CIDR prefix">
                     </td>
                 </tr>
                 <tr>
-                    <td class="span1"><div class="heading">Host Range</div></td>
-                    <td class="span1"><div class="copyable" id="firsthostaddress" title="Click to copy"></div></td>
-                    <td class="span1"><div class="copyable" id="lasthostaddress" title="Click to copy"></div></td>
+                    <td class="label">Host Range</td>
+                    <td class="value"><span class="copyable" id="firsthostaddress" title="Click to copy"></span></td>
+                    <td class="value"><span class="copyable" id="lasthostaddress" title="Click to copy"></span></td>
                 </tr>
                 <tr>
-                    <td><div class="heading">Prefix</div></td>
-                    <td><select id="subnetslashdropdown" aria-label="Subnet prefix length"></select></td>
-                    <td class="v4-only"><select id="subnetdotdropdown" aria-label="Subnet mask (dotted decimal)"></select></td>
+                    <td class="label">Prefix</td>
+                    <td class="value"><select id="subnetslashdropdown" aria-label="Subnet prefix length"></select></td>
+                    <td class="value v4-only"><select id="subnetdotdropdown" aria-label="Subnet mask (dotted decimal)"></select></td>
                 </tr>
                 <tr class="v4-only">
-                    <td><div class="heading">Usable Addresses</div></td>
-                    <td><select id="usableaddressesdropdown" aria-label="Usable address count"></select></td>
+                    <td class="label">Usable Addresses</td>
+                    <td class="value"><select id="usableaddressesdropdown" aria-label="Usable address count"></select></td>
                 </tr>
                 <tr class="v6-only">
-                    <td><div class="heading">Total Addresses</div></td>
-                    <td colspan="2"><div class="copyable" id="totaladdresses" title="Click to copy"></div></td>
+                    <td class="label">Total Addresses</td>
+                    <td class="value" colspan="2"><span class="copyable" id="totaladdresses" title="Click to copy"></span></td>
                 </tr>
                 <tr>
-                    <td><div class="heading">Network Address</div></td>
-                    <td colspan="2"><div class="copyable" id="networkaddressdiv" title="Click to copy"></div></td>
+                    <td class="label">Network Address</td>
+                    <td class="value" colspan="2"><span class="copyable" id="networkaddressdiv" title="Click to copy"></span></td>
                 </tr>
                 <tr class="v6-only">
-                    <td><div class="heading">Expanded</div></td>
-                    <td colspan="2"><div class="copyable" id="expandedaddress" title="Click to copy"></div></td>
+                    <td class="label">Expanded</td>
+                    <td class="value" colspan="2"><span class="copyable" id="expandedaddress" title="Click to copy"></span></td>
                 </tr>
                 <tr class="v4-only">
-                    <td><div class="heading">Broadcast Address</div></td>
-                    <td><div class="copyable" id="broadcastaddress" title="Click to copy"></div></td>
+                    <td class="label">Broadcast Address</td>
+                    <td class="value" colspan="2"><span class="copyable" id="broadcastaddress" title="Click to copy"></span></td>
                 </tr>
                 <tr class="v4-only">
-                    <td><div class="heading">Wildcard Mask</div></td>
-                    <td><div class="copyable" id="wildcardmask" title="Click to copy"></div></td>
+                    <td class="label">Wildcard Mask</td>
+                    <td class="value" colspan="2"><span class="copyable" id="wildcardmask" title="Click to copy"></span></td>
                 </tr>
                 <tr class="v4-only">
-                    <td><div class="heading">Hex Mask</div></td>
-                    <td><div class="copyable" id="hexmask" title="Click to copy"></div></td>
+                    <td class="label">Hex Mask</td>
+                    <td class="value" colspan="2"><span class="copyable" id="hexmask" title="Click to copy"></span></td>
                 </tr>
-                <tr id="binaryrow" class="v4-only">
-                    <td><div class="heading">Binary</div></td>
-                    <td colspan="2"><div class="binary copyable" id="binaryview" title="Click to copy"></div></td>
+                <tr class="v4-only">
+                    <td class="label">Binary</td>
+                    <td class="value" colspan="2"><span class="binary copyable" id="binaryview" title="Click to copy"></span></td>
                 </tr>
+                <tr>
+                    <td class="label">Split into</td>
+                    <td class="value"><select id="vlsm-prefix" aria-label="Child subnet prefix length"></select></td>
+                    <td class="value v4-only"><select id="vlsm-subnets" aria-label="Number of subnets"></select></td>
+                </tr>
+                <tr class="v4-only">
+                    <td class="label">Hosts per subnet</td>
+                    <td class="value" colspan="2"><select id="vlsm-hosts" aria-label="Usable hosts per subnet"></select></td>
+                </tr>
+                <tr id="vlsm-status" class="hide">
+                    <td></td>
+                    <td colspan="2" class="vlsm-status" id="vlsm-count"></td>
+                </tr>
+                </tbody>
+                <tbody id="vlsm-list" aria-live="polite"></tbody>
             </table>
         </div>
 
-        <div id="vlsm">
-            <h2>Split this subnet:</h2>
-            <div id="vlsm-controls">
-                into
-                <select id="vlsm-prefix" aria-label="Child subnet prefix length"></select>
-                subnets
-                <span id="vlsm-count"></span>
-            </div>
-            <div id="vlsm-list" aria-live="polite"></div>
-        </div>
-
-        <div id="words">
-            <br>Please contribute! <a href="https://github.com/richard-gray/subcal" target="_blank" rel="noopener">github.com/richard-gray/subcal</a>
-        </div>
-        <div id='hint'>IPv4 or IPv6 (e.g. <code>2001:db8::/64</code>) &middot; arrow keys step subnets &middot; click any value to copy &middot; press <kbd>?</kbd> for shortcuts</div>
+        <div id="hint">IPv4 or IPv6 (e.g. <code>2001:db8::/64</code>) &middot; arrow keys step subnets &middot; click any value to copy &middot; press <kbd>?</kbd> for shortcuts</div>
+        <div id="words">Contribute at <a href="https://github.com/richard-gray/subcal" target="_blank" rel="noopener">github.com/richard-gray/subcal</a></div>
+        <div id="footer">Richard Gray &middot; @goodgigs &middot; subcal.io</div>
     </div>
-    <div id='footer'>Richard Gray @goodgigs subcal.io</div>
     <div id="toast" role="status" aria-live="polite"></div>
 
     <div id="help-overlay" role="dialog" aria-label="Keyboard shortcuts" aria-modal="true">
@@ -394,7 +384,6 @@ https://github.com/richard-gray/subcal
                 <tr><td><kbd>w</kbd></td><td>copy wildcard mask (v4 only)</td></tr>
                 <tr><td><kbd>x</kbd></td><td>copy hex mask (v4 only)</td></tr>
                 <tr><td><kbd>e</kbd></td><td>copy expanded form (v6 only)</td></tr>
-                <tr><td><kbd>v</kbd></td><td>toggle VLSM list</td></tr>
                 <tr><td><kbd>/</kbd></td><td>focus address input</td></tr>
                 <tr><td><kbd>?</kbd></td><td>this help</td></tr>
                 <tr><td><kbd>Esc</kbd></td><td>close / blur</td></tr>
@@ -424,7 +413,10 @@ https://github.com/richard-gray/subcal
             expanded:     $('expandedaddress'),
             totalAddrs:   $('totaladdresses'),
             vlsmPrefix:   $('vlsm-prefix'),
+            vlsmSubnets:  $('vlsm-subnets'),
+            vlsmHosts:    $('vlsm-hosts'),
             vlsmCount:    $('vlsm-count'),
+            vlsmStatus:   $('vlsm-status'),
             vlsmList:     $('vlsm-list'),
             toast:        $('toast'),
             helpOverlay:  $('help-overlay'),
@@ -667,7 +659,9 @@ https://github.com/richard-gray/subcal
 
         function render(p) {
             if (!p) {
-                els.input.style.background = 'var(--error-bg)';
+                // Empty field is "not yet entered" — leave it neutral so the
+                // placeholder text shows. Only flag invalid (non-empty) input.
+                els.input.style.background = els.input.value.trim() === '' ? '' : 'var(--error-bg)';
                 lastParsed = null;
                 return;
             }
@@ -793,43 +787,75 @@ https://github.com/richard-gray/subcal
             const currentPrefix = p.prefix;
             const maxPrefix = p.mode === 'v6' ? 128 : 32;
             const previous = els.vlsmPrefix.value;
+
             els.vlsmPrefix.innerHTML = '';
+            els.vlsmSubnets.innerHTML = '';
+            els.vlsmHosts.innerHTML = '';
+
             for (let x = currentPrefix + 1; x <= maxPrefix; x++) {
-                const o = document.createElement('option');
-                o.value = String(x);
-                o.text = '/' + x;
-                els.vlsmPrefix.add(o);
-            }
-            if (els.vlsmPrefix.options.length === 0) {
-                els.vlsmPrefix.disabled = true;
-                els.vlsmCount.textContent = '(already at /' + maxPrefix + ')';
-            } else {
-                els.vlsmPrefix.disabled = false;
-                const want = parseInt(previous, 10);
-                if (!isNaN(want) && want > currentPrefix && want <= maxPrefix) {
-                    els.vlsmPrefix.value = previous;
-                } else {
-                    els.vlsmPrefix.value = String(Math.min(currentPrefix + 1, maxPrefix));
+                const prefOpt = document.createElement('option');
+                prefOpt.value = String(x);
+                prefOpt.text = '/' + x;
+                els.vlsmPrefix.add(prefOpt);
+
+                if (p.mode === 'v4') {
+                    const subOpt = document.createElement('option');
+                    subOpt.value = String(x);
+                    subOpt.text = String(Math.pow(2, x - currentPrefix));
+                    els.vlsmSubnets.add(subOpt);
+
+                    const hostOpt = document.createElement('option');
+                    hostOpt.value = String(x);
+                    if      (x === 30) hostOpt.text = '2 (/30)';
+                    else if (x === 31) hostOpt.text = '2 (/31 ptp)';
+                    else if (x === 32) hostOpt.text = '1 (/32 host)';
+                    else               hostOpt.text = String(usableCount(x));
+                    els.vlsmHosts.add(hostOpt);
                 }
-                els.vlsmCount.textContent = '';
             }
+
+            const empty = els.vlsmPrefix.options.length === 0;
+            els.vlsmPrefix.disabled = empty;
+            els.vlsmSubnets.disabled = empty;
+            els.vlsmHosts.disabled = empty;
+
+            if (empty) {
+                els.vlsmCount.textContent = 'already at /' + maxPrefix;
+                els.vlsmStatus.classList.remove('hide');
+                return;
+            }
+
+            const want = parseInt(previous, 10);
+            const target = (!isNaN(want) && want > currentPrefix && want <= maxPrefix)
+                ? String(previous)
+                : String(Math.min(currentPrefix + 1, maxPrefix));
+            els.vlsmPrefix.value = target;
+            if (p.mode === 'v4') {
+                els.vlsmSubnets.value = target;
+                els.vlsmHosts.value = target;
+            }
+        }
+
+        // Sync all three VLSM dropdowns to the same target prefix.
+        function syncVlsmTarget(source) {
+            const v = source.value;
+            if (source !== els.vlsmPrefix)  els.vlsmPrefix.value = v;
+            if (source !== els.vlsmSubnets) els.vlsmSubnets.value = v;
+            if (source !== els.vlsmHosts)   els.vlsmHosts.value = v;
+            renderVlsm();
         }
 
         const MAX_VLSM_ROWS = 1024;
         function renderVlsm() {
             const p = lastParsed;
             const list = els.vlsmList;
-            if (!p || !els.vlsmPrefix.value) {
-                list.innerHTML = '';
-                els.vlsmCount.textContent = '';
-                return;
-            }
+            list.innerHTML = '';
+            els.vlsmCount.textContent = '';
+            els.vlsmStatus.classList.add('hide');
+
+            if (!p || !els.vlsmPrefix.value || els.vlsmPrefix.disabled) return;
             const targetPrefix = parseInt(els.vlsmPrefix.value, 10);
-            if (targetPrefix <= p.prefix) {
-                list.innerHTML = '';
-                els.vlsmCount.textContent = '';
-                return;
-            }
+            if (targetPrefix <= p.prefix) return;
 
             const isV6 = p.mode === 'v6';
             const totalChildren = isV6
@@ -841,7 +867,10 @@ https://github.com/richard-gray/subcal
 
             const totalLabel = isV6 ? formatBigCount(totalChildren) : totalChildren.toLocaleString();
             const truncated = isV6 ? (totalChildren > BigInt(shown)) : (totalChildren > shown);
-            els.vlsmCount.textContent = '(' + totalLabel + (truncated ? ', showing first ' + shown : '') + ')';
+            if (truncated) {
+                els.vlsmCount.textContent = 'showing first ' + shown + ' of ' + totalLabel;
+                els.vlsmStatus.classList.remove('hide');
+            }
 
             const frag = document.createDocumentFragment();
 
@@ -880,28 +909,29 @@ https://github.com/richard-gray/subcal
         }
 
         function buildVlsmRow(cidr, rangeText) {
-            const row = document.createElement('div');
-            row.className = 'vlsm-row';
+            const tr = document.createElement('tr');
 
+            const labelTd = document.createElement('td');
+            labelTd.className = 'label';
+            // Empty label cell — keeps column alignment with the rows above.
+
+            const cidrTd = document.createElement('td');
+            cidrTd.className = 'value';
             const cidrSpan = document.createElement('span');
-            cidrSpan.className = 'vlsm-cidr copyable';
+            cidrSpan.className = 'copyable';
             cidrSpan.title = 'Click to copy';
             cidrSpan.textContent = cidr;
-            cidrSpan.addEventListener('click', (e) => {
-                e.stopPropagation();
-                copy(cidr, cidrSpan, 'cidr');
-            });
+            cidrSpan.addEventListener('click', () => copy(cidr, cidrSpan, 'cidr'));
+            cidrTd.appendChild(cidrSpan);
 
-            const rangeSpan = document.createElement('span');
-            rangeSpan.className = 'vlsm-range';
-            rangeSpan.textContent = rangeText;
+            const rangeTd = document.createElement('td');
+            rangeTd.className = 'value vlsm-range';
+            rangeTd.textContent = rangeText;
 
-            row.appendChild(cidrSpan);
-            row.appendChild(rangeSpan);
-            return row;
-        }
-        function toggleVlsmList() {
-            els.vlsmList.classList.toggle('shown');
+            tr.appendChild(labelTd);
+            tr.appendChild(cidrTd);
+            tr.appendChild(rangeTd);
+            return tr;
         }
 
         // ---------- Keyboard ----------
@@ -1028,7 +1058,6 @@ https://github.com/richard-gray/subcal
                 case ']':          e.preventDefault(); stepPrefix( 1); break;
                 case '[':          e.preventDefault(); stepPrefix(-1); break;
                 case '?':          e.preventDefault(); showHelp(true); break;
-                case 'v':          e.preventDefault(); toggleVlsmList(); break;
                 case 'c': case 'C':
                 case 'b':
                 case 'h': case 'H':
@@ -1048,7 +1077,9 @@ https://github.com/richard-gray/subcal
         els.slashSelect.addEventListener('change',  () => setPrefixFromSelect(els.slashSelect));
         els.dotSelect.addEventListener('change',    () => setPrefixFromSelect(els.dotSelect));
         els.usableSelect.addEventListener('change', () => setPrefixFromSelect(els.usableSelect));
-        els.vlsmPrefix.addEventListener('change', () => { renderVlsm(); els.vlsmList.classList.add('shown'); });
+        els.vlsmPrefix.addEventListener('change',  () => syncVlsmTarget(els.vlsmPrefix));
+        els.vlsmSubnets.addEventListener('change', () => syncVlsmTarget(els.vlsmSubnets));
+        els.vlsmHosts.addEventListener('change',   () => syncVlsmTarget(els.vlsmHosts));
 
         [els.firstHost, els.lastHost, els.network, els.broadcast,
          els.wildcard, els.hexmask, els.binary,
