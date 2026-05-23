@@ -139,6 +139,28 @@ https://github.com/richard-gray/subcal
         .span3 { width: 30em; max-width: 100%; }
         .span1 { width: 10em; }
 
+        /* Mode-based row visibility */
+        .v4-only { display: table-row; }
+        .v6-only { display: none; }
+        body.v6 .v4-only { display: none; }
+        body.v6 .v6-only { display: table-row; }
+        td.v4-only { display: table-cell; }
+        td.v6-only { display: none; }
+        body.v6 td.v4-only { display: none; }
+        body.v6 td.v6-only { display: table-cell; }
+
+        .mode-tag {
+            display: inline-block;
+            font-size: 0.5em;
+            padding: 0.05em 0.4em;
+            border-radius: 3px;
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            vertical-align: middle;
+            margin-left: 0.3em;
+        }
+
         .copyable {
             cursor: pointer;
             user-select: all;
@@ -296,31 +318,39 @@ https://github.com/richard-gray/subcal
                     <td class="span1"><div class="copyable" id="lasthostaddress" title="Click to copy"></div></td>
                 </tr>
                 <tr>
-                    <td><div class="heading">Subnet Mask</div></td>
+                    <td><div class="heading">Prefix</div></td>
                     <td><select id="subnetslashdropdown" aria-label="Subnet prefix length"></select></td>
-                    <td><select id="subnetdotdropdown" aria-label="Subnet mask (dotted decimal)"></select></td>
+                    <td class="v4-only"><select id="subnetdotdropdown" aria-label="Subnet mask (dotted decimal)"></select></td>
                 </tr>
-                <tr>
+                <tr class="v4-only">
                     <td><div class="heading">Usable Addresses</div></td>
                     <td><select id="usableaddressesdropdown" aria-label="Usable address count"></select></td>
                 </tr>
-                <tr>
-                    <td><div class="heading">Network Address</div></td>
-                    <td><div class="copyable" id="networkaddressdiv" title="Click to copy"></div></td>
+                <tr class="v6-only">
+                    <td><div class="heading">Total Addresses</div></td>
+                    <td colspan="2"><div class="copyable" id="totaladdresses" title="Click to copy"></div></td>
                 </tr>
                 <tr>
+                    <td><div class="heading">Network Address</div></td>
+                    <td colspan="2"><div class="copyable" id="networkaddressdiv" title="Click to copy"></div></td>
+                </tr>
+                <tr class="v6-only">
+                    <td><div class="heading">Expanded</div></td>
+                    <td colspan="2"><div class="copyable" id="expandedaddress" title="Click to copy"></div></td>
+                </tr>
+                <tr class="v4-only">
                     <td><div class="heading">Broadcast Address</div></td>
                     <td><div class="copyable" id="broadcastaddress" title="Click to copy"></div></td>
                 </tr>
-                <tr>
+                <tr class="v4-only">
                     <td><div class="heading">Wildcard Mask</div></td>
                     <td><div class="copyable" id="wildcardmask" title="Click to copy"></div></td>
                 </tr>
-                <tr>
+                <tr class="v4-only">
                     <td><div class="heading">Hex Mask</div></td>
                     <td><div class="copyable" id="hexmask" title="Click to copy"></div></td>
                 </tr>
-                <tr id="binaryrow">
+                <tr id="binaryrow" class="v4-only">
                     <td><div class="heading">Binary</div></td>
                     <td colspan="2"><div class="binary copyable" id="binaryview" title="Click to copy"></div></td>
                 </tr>
@@ -341,7 +371,7 @@ https://github.com/richard-gray/subcal
         <div id="words">
             <br>Please contribute! <a href="https://github.com/richard-gray/subcal" target="_blank" rel="noopener">github.com/richard-gray/subcal</a>
         </div>
-        <div id='hint'>arrow keys step subnets &middot; click any value to copy &middot; press <kbd>?</kbd> for shortcuts</div>
+        <div id='hint'>IPv4 or IPv6 (e.g. <code>2001:db8::/64</code>) &middot; arrow keys step subnets &middot; click any value to copy &middot; press <kbd>?</kbd> for shortcuts</div>
     </div>
     <div id='footer'>Richard Gray @goodgigs subcal.io</div>
     <div id="toast" role="status" aria-live="polite"></div>
@@ -355,12 +385,13 @@ https://github.com/richard-gray/subcal
                 <tr><td><kbd>]</kbd> / <kbd>[</kbd></td><td>same as &rarr; / &larr;</td></tr>
                 <tr><td><kbd>c</kbd></td><td>copy network address</td></tr>
                 <tr><td><kbd>C</kbd></td><td>copy CIDR (network/prefix)</td></tr>
-                <tr><td><kbd>b</kbd></td><td>copy broadcast address</td></tr>
-                <tr><td><kbd>h</kbd></td><td>copy first host</td></tr>
-                <tr><td><kbd>H</kbd></td><td>copy last host</td></tr>
-                <tr><td><kbd>m</kbd></td><td>copy subnet mask</td></tr>
-                <tr><td><kbd>w</kbd></td><td>copy wildcard mask</td></tr>
-                <tr><td><kbd>x</kbd></td><td>copy hex mask</td></tr>
+                <tr><td><kbd>b</kbd></td><td>copy broadcast (v4 only)</td></tr>
+                <tr><td><kbd>h</kbd></td><td>copy first host / address</td></tr>
+                <tr><td><kbd>H</kbd></td><td>copy last host / address</td></tr>
+                <tr><td><kbd>m</kbd></td><td>copy subnet mask (v4 only)</td></tr>
+                <tr><td><kbd>w</kbd></td><td>copy wildcard mask (v4 only)</td></tr>
+                <tr><td><kbd>x</kbd></td><td>copy hex mask (v4 only)</td></tr>
+                <tr><td><kbd>e</kbd></td><td>copy expanded form (v6 only)</td></tr>
                 <tr><td><kbd>v</kbd></td><td>toggle VLSM list</td></tr>
                 <tr><td><kbd>/</kbd></td><td>focus address input</td></tr>
                 <tr><td><kbd>?</kbd></td><td>this help</td></tr>
@@ -388,6 +419,8 @@ https://github.com/richard-gray/subcal
             wildcard:     $('wildcardmask'),
             hexmask:      $('hexmask'),
             binary:       $('binaryview'),
+            expanded:     $('expandedaddress'),
+            totalAddrs:   $('totaladdresses'),
             vlsmPrefix:   $('vlsm-prefix'),
             vlsmCount:    $('vlsm-count'),
             vlsmList:     $('vlsm-list'),
@@ -430,17 +463,137 @@ https://github.com/richard-gray/subcal
             return (n >>> 0).toString(2).padStart(8, '0');
         }
 
+        // ---------- Pure math (IPv6 / BigInt 128-bit) ----------
+        const V6_MAX = (1n << 128n) - 1n;
+
+        function v6PrefixToMask(prefix) {
+            if (prefix === 0) return 0n;
+            if (prefix === 128) return V6_MAX;
+            return ((1n << BigInt(prefix)) - 1n) << BigInt(128 - prefix);
+        }
+        function v6Wildcard(mask) { return mask ^ V6_MAX; }
+        function v6NetworkOf(ip, mask) { return ip & mask; }
+        function v6LastOf(ip, mask) { return (ip & mask) | v6Wildcard(mask); }
+
+        function v6ToHextets(n) {
+            const hextets = new Array(8);
+            for (let i = 0; i < 8; i++) {
+                hextets[7 - i] = Number((n >> BigInt(i * 16)) & 0xFFFFn);
+            }
+            return hextets;
+        }
+        function hextetsToBigInt(hextets) {
+            let n = 0n;
+            for (let i = 0; i < 8; i++) {
+                n = (n << 16n) | BigInt(hextets[i]);
+            }
+            return n;
+        }
+        function v6ToCanonical(n) {
+            const hextets = v6ToHextets(n);
+            let bestStart = -1, bestLen = 0;
+            let curStart = -1, curLen = 0;
+            for (let i = 0; i < 8; i++) {
+                if (hextets[i] === 0) {
+                    if (curStart === -1) curStart = i;
+                    curLen++;
+                    if (curLen > bestLen) { bestStart = curStart; bestLen = curLen; }
+                } else {
+                    curStart = -1;
+                    curLen = 0;
+                }
+            }
+            // :: must compress 2+ hextets (RFC 5952).
+            if (bestLen < 2) bestStart = -1;
+
+            let result = '';
+            let i = 0;
+            while (i < 8) {
+                if (i === bestStart) {
+                    result += '::';
+                    i += bestLen;
+                    if (i === 8) return result;
+                } else {
+                    if (result && !result.endsWith(':')) result += ':';
+                    result += hextets[i].toString(16);
+                    i++;
+                }
+            }
+            return result;
+        }
+        function v6ToExpanded(n) {
+            return v6ToHextets(n).map(h => h.toString(16).padStart(4, '0')).join(':');
+        }
+
+        // Format a large BigInt count with separators + scientific-ish shorthand.
+        function formatBigCount(n) {
+            const s = n.toString();
+            const withCommas = s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            if (s.length <= 12) return withCommas;
+            // For huge numbers, also show approximate magnitude.
+            return withCommas + ' (~10^' + (s.length - 1) + ')';
+        }
+
         // ---------- Parsing / validation ----------
         const cidrRe = /^(25[0-5]|2[0-4]\d|1?\d?\d)(\.(25[0-5]|2[0-4]\d|1?\d?\d)){3}\/([0-9]|[12]\d|3[0-2])$/;
-        function parse(value) {
-            value = (value || '').trim();
+
+        function v4Parse(value) {
             if (!cidrRe.test(value)) return null;
             const [ipStr, prefixStr] = value.split('/');
             return {
+                mode: 'v4',
                 ipStr,
                 prefix: parseInt(prefixStr, 10),
                 ip: ipToNumber(ipStr),
             };
+        }
+
+        function v6Parse(value) {
+            value = value.toLowerCase();
+            const slashIdx = value.lastIndexOf('/');
+            if (slashIdx === -1) return null;
+            const addrStr = value.slice(0, slashIdx);
+            const prefixStr = value.slice(slashIdx + 1);
+            if (!/^\d+$/.test(prefixStr)) return null;
+            const prefix = parseInt(prefixStr, 10);
+            if (String(prefix) !== prefixStr || prefix < 0 || prefix > 128) return null;
+
+            // Reject more than one '::'.
+            const doubleColonCount = (addrStr.match(/::/g) || []).length;
+            if (doubleColonCount > 1) return null;
+
+            let parts;
+            if (doubleColonCount === 1) {
+                const [left, right] = addrStr.split('::');
+                const leftParts = left === '' ? [] : left.split(':');
+                const rightParts = right === '' ? [] : right.split(':');
+                if (leftParts.length + rightParts.length >= 8) return null;
+                const zeros = new Array(8 - leftParts.length - rightParts.length).fill('0');
+                parts = leftParts.concat(zeros, rightParts);
+            } else {
+                parts = addrStr.split(':');
+                if (parts.length !== 8) return null;
+            }
+            for (const p of parts) {
+                if (!/^[0-9a-f]{1,4}$/.test(p)) return null;
+            }
+            const hextets = parts.map(p => parseInt(p, 16));
+            return {
+                mode: 'v6',
+                ipStr: addrStr,
+                prefix,
+                ip: hextetsToBigInt(hextets),
+            };
+        }
+
+        function parse(value) {
+            value = (value || '').trim();
+            if (!value) return null;
+            // v6 if it contains a colon (in the address part).
+            const slashIdx = value.lastIndexOf('/');
+            const addrPart = slashIdx === -1 ? value : value.slice(0, slashIdx);
+            if (addrPart.includes(':')) return v6Parse(value);
+            return v4Parse(value);
         }
 
         // ---------- Output helpers ----------
@@ -469,15 +622,9 @@ https://github.com/richard-gray/subcal
 
         // ---------- Render ----------
         let lastParsed = null;
-        function render(p) {
-            if (!p) {
-                els.input.style.background = 'var(--error-bg)';
-                lastParsed = null;
-                return;
-            }
-            els.input.style.background = '';
-            lastParsed = p;
+        let currentMode = null;
 
+        function renderV4(p) {
             const mask = prefixToMask(p.prefix);
             const wc   = wildcardOf(mask);
 
@@ -498,9 +645,41 @@ https://github.com/richard-gray/subcal
             setOutput(els.wildcard, numberToIp(wc));
             setOutput(els.hexmask,  toHex32(mask));
             setBinary(p.ip, p.prefix);
+        }
+
+        function renderV6(p) {
+            const mask = v6PrefixToMask(p.prefix);
+            const network = v6NetworkOf(p.ip, mask);
+            const last    = v6LastOf(p.ip, mask);
+            const total   = 1n << BigInt(128 - p.prefix);
+
+            // Reuse the host-range row for "address range" in v6 (no broadcast subtraction).
+            setOutput(els.firstHost, v6ToCanonical(network));
+            setOutput(els.lastHost,  v6ToCanonical(last));
+            setOutput(els.network,   v6ToCanonical(network));
+            setOutput(els.expanded,  v6ToExpanded(p.ip));
+            setOutput(els.totalAddrs, formatBigCount(total));
+
+            els.slashSelect.value = String(p.prefix);
+        }
+
+        function render(p) {
+            if (!p) {
+                els.input.style.background = 'var(--error-bg)';
+                lastParsed = null;
+                return;
+            }
+            els.input.style.background = '';
+            lastParsed = p;
+
+            ensureDropdownsFor(p.mode);
+            document.body.classList.toggle('v6', p.mode === 'v6');
+
+            if (p.mode === 'v4') renderV4(p);
+            else renderV6(p);
 
             updateHash(p);
-            refreshVlsmPrefixOptions(p.prefix);
+            refreshVlsmPrefixOptions(p);
             renderVlsm();
         }
 
@@ -509,28 +688,44 @@ https://github.com/richard-gray/subcal
         }
 
         // ---------- Dropdowns ----------
-        function generateDropdowns() {
-            for (let x = 32; x > 0; x--) {
-                const slashOpt = document.createElement('option');
-                slashOpt.value = String(x);
-                slashOpt.text = '/' + x;
-                els.slashSelect.add(slashOpt);
+        function ensureDropdownsFor(mode) {
+            if (currentMode === mode) return;
+            currentMode = mode;
+            els.slashSelect.innerHTML = '';
+            els.dotSelect.innerHTML = '';
+            els.usableSelect.innerHTML = '';
 
-                const dotOpt = document.createElement('option');
-                dotOpt.value = String(x);
-                dotOpt.text = numberToIp(prefixToMask(x));
-                els.dotSelect.add(dotOpt);
+            if (mode === 'v4') {
+                for (let x = 32; x > 0; x--) {
+                    const slashOpt = document.createElement('option');
+                    slashOpt.value = String(x);
+                    slashOpt.text = '/' + x;
+                    els.slashSelect.add(slashOpt);
 
-                if (x !== 30) {
-                    const usableOpt = document.createElement('option');
-                    usableOpt.value = String(x);
-                    usableOpt.text = String(usableCount(x));
-                    els.usableSelect.add(usableOpt);
+                    const dotOpt = document.createElement('option');
+                    dotOpt.value = String(x);
+                    dotOpt.text = numberToIp(prefixToMask(x));
+                    els.dotSelect.add(dotOpt);
+
+                    if (x !== 30) {
+                        const usableOpt = document.createElement('option');
+                        usableOpt.value = String(x);
+                        usableOpt.text = String(usableCount(x));
+                        els.usableSelect.add(usableOpt);
+                    }
+                }
+            } else {
+                for (let x = 128; x >= 0; x--) {
+                    const o = document.createElement('option');
+                    o.value = String(x);
+                    o.text = '/' + x;
+                    els.slashSelect.add(o);
                 }
             }
         }
         function setPrefixFromSelect(select) {
-            const ipStr = els.input.value.split('/')[0];
+            const slashIdx = els.input.value.lastIndexOf('/');
+            const ipStr = slashIdx === -1 ? els.input.value : els.input.value.slice(0, slashIdx);
             const candidate = ipStr + '/' + select.value;
             if (parse(candidate)) {
                 els.input.value = candidate;
@@ -590,11 +785,12 @@ https://github.com/richard-gray/subcal
         }
 
         // ---------- VLSM splitter ----------
-        function refreshVlsmPrefixOptions(currentPrefix) {
+        function refreshVlsmPrefixOptions(p) {
+            const currentPrefix = p.prefix;
+            const maxPrefix = p.mode === 'v6' ? 128 : 32;
             const previous = els.vlsmPrefix.value;
             els.vlsmPrefix.innerHTML = '';
-            // Allow target prefix in (current, 32].
-            for (let x = currentPrefix + 1; x <= 32; x++) {
+            for (let x = currentPrefix + 1; x <= maxPrefix; x++) {
                 const o = document.createElement('option');
                 o.value = String(x);
                 o.text = '/' + x;
@@ -602,16 +798,14 @@ https://github.com/richard-gray/subcal
             }
             if (els.vlsmPrefix.options.length === 0) {
                 els.vlsmPrefix.disabled = true;
-                els.vlsmCount.textContent = '(already at /32)';
+                els.vlsmCount.textContent = '(already at /' + maxPrefix + ')';
             } else {
                 els.vlsmPrefix.disabled = false;
-                // Restore previous selection if still valid; else pick a sensible default.
                 const want = parseInt(previous, 10);
-                if (!isNaN(want) && want > currentPrefix && want <= 32) {
+                if (!isNaN(want) && want > currentPrefix && want <= maxPrefix) {
                     els.vlsmPrefix.value = previous;
                 } else {
-                    // Default to splitting in half: current + 1, or stay at current target if small.
-                    els.vlsmPrefix.value = String(Math.min(currentPrefix + 1, 32));
+                    els.vlsmPrefix.value = String(Math.min(currentPrefix + 1, maxPrefix));
                 }
                 els.vlsmCount.textContent = '';
             }
@@ -633,50 +827,74 @@ https://github.com/richard-gray/subcal
                 return;
             }
 
-            const parentMask = prefixToMask(p.prefix);
-            const parentNet = networkOf(p.ip, parentMask);
-            const childMask = prefixToMask(targetPrefix);
-            const childSize = targetPrefix === 0 ? 0 : (((~childMask) >>> 0) + 1);
-            const totalChildren = Math.pow(2, targetPrefix - p.prefix);
-            const shown = Math.min(totalChildren, MAX_VLSM_ROWS);
+            const isV6 = p.mode === 'v6';
+            const totalChildren = isV6
+                ? (1n << BigInt(targetPrefix - p.prefix))
+                : Math.pow(2, targetPrefix - p.prefix);
+            const shown = isV6
+                ? (totalChildren > BigInt(MAX_VLSM_ROWS) ? MAX_VLSM_ROWS : Number(totalChildren))
+                : Math.min(totalChildren, MAX_VLSM_ROWS);
 
-            els.vlsmCount.textContent = '(' + totalChildren.toLocaleString() + (totalChildren > shown ? ', showing first ' + shown : '') + ')';
+            const totalLabel = isV6 ? formatBigCount(totalChildren) : totalChildren.toLocaleString();
+            const truncated = isV6 ? (totalChildren > BigInt(shown)) : (totalChildren > shown);
+            els.vlsmCount.textContent = '(' + totalLabel + (truncated ? ', showing first ' + shown : '') + ')';
 
             const frag = document.createDocumentFragment();
-            for (let i = 0; i < shown; i++) {
-                const childNet = (parentNet + i * childSize) >>> 0;
-                const childBcast = (childNet | ((~childMask) >>> 0)) >>> 0;
-                const cidr = numberToIp(childNet) + '/' + targetPrefix;
 
-                let rangeText;
-                if (targetPrefix >= 31) {
-                    rangeText = numberToIp(childNet) + ' – ' + numberToIp(childBcast);
-                } else {
-                    rangeText = numberToIp((childNet + 1) >>> 0) + ' – ' + numberToIp((childBcast - 1) >>> 0);
+            if (isV6) {
+                const parentMask = v6PrefixToMask(p.prefix);
+                const parentNet = v6NetworkOf(p.ip, parentMask);
+                const childMask = v6PrefixToMask(targetPrefix);
+                const childSize = 1n << BigInt(128 - targetPrefix);
+
+                for (let i = 0; i < shown; i++) {
+                    const childNet = parentNet + BigInt(i) * childSize;
+                    const childLast = childNet | v6Wildcard(childMask);
+                    const cidr = v6ToCanonical(childNet) + '/' + targetPrefix;
+                    const rangeText = v6ToCanonical(childNet) + ' – ' + v6ToCanonical(childLast);
+                    frag.appendChild(buildVlsmRow(cidr, rangeText));
                 }
+            } else {
+                const parentMask = prefixToMask(p.prefix);
+                const parentNet = networkOf(p.ip, parentMask);
+                const childMask = prefixToMask(targetPrefix);
+                const childSize = targetPrefix === 0 ? 0 : (((~childMask) >>> 0) + 1);
 
-                const row = document.createElement('div');
-                row.className = 'vlsm-row';
-
-                const cidrSpan = document.createElement('span');
-                cidrSpan.className = 'vlsm-cidr copyable';
-                cidrSpan.title = 'Click to copy';
-                cidrSpan.textContent = cidr;
-                cidrSpan.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    copy(cidr, cidrSpan, 'cidr');
-                });
-
-                const rangeSpan = document.createElement('span');
-                rangeSpan.className = 'vlsm-range';
-                rangeSpan.textContent = rangeText;
-
-                row.appendChild(cidrSpan);
-                row.appendChild(rangeSpan);
-                frag.appendChild(row);
+                for (let i = 0; i < shown; i++) {
+                    const childNet = (parentNet + i * childSize) >>> 0;
+                    const childBcast = (childNet | ((~childMask) >>> 0)) >>> 0;
+                    const cidr = numberToIp(childNet) + '/' + targetPrefix;
+                    const rangeText = targetPrefix >= 31
+                        ? numberToIp(childNet) + ' – ' + numberToIp(childBcast)
+                        : numberToIp((childNet + 1) >>> 0) + ' – ' + numberToIp((childBcast - 1) >>> 0);
+                    frag.appendChild(buildVlsmRow(cidr, rangeText));
+                }
             }
+
             list.innerHTML = '';
             list.appendChild(frag);
+        }
+
+        function buildVlsmRow(cidr, rangeText) {
+            const row = document.createElement('div');
+            row.className = 'vlsm-row';
+
+            const cidrSpan = document.createElement('span');
+            cidrSpan.className = 'vlsm-cidr copyable';
+            cidrSpan.title = 'Click to copy';
+            cidrSpan.textContent = cidr;
+            cidrSpan.addEventListener('click', (e) => {
+                e.stopPropagation();
+                copy(cidr, cidrSpan, 'cidr');
+            });
+
+            const rangeSpan = document.createElement('span');
+            rangeSpan.className = 'vlsm-range';
+            rangeSpan.textContent = rangeText;
+
+            row.appendChild(cidrSpan);
+            row.appendChild(rangeSpan);
+            return row;
         }
         function toggleVlsmList() {
             els.vlsmList.classList.toggle('shown');
@@ -691,41 +909,67 @@ https://github.com/richard-gray/subcal
         }
         function stepPrefix(delta) {
             if (!lastParsed) return;
+            const maxPrefix = lastParsed.mode === 'v6' ? 128 : 32;
             const newPrefix = lastParsed.prefix + delta;
-            if (newPrefix < 0 || newPrefix > 32) return;
+            if (newPrefix < 0 || newPrefix > maxPrefix) return;
             els.input.value = lastParsed.ipStr + '/' + newPrefix;
             update();
             bounce(delta > 0 ? 'right' : 'left');
         }
         function stepSubnet(delta) {
             if (!lastParsed) return;
-            const mask = prefixToMask(lastParsed.prefix);
-            const size = lastParsed.prefix === 0 ? 0 : (((~mask) >>> 0) + 1);
-            const next = (networkOf(lastParsed.ip, mask) + delta * size) >>> 0;
-            els.input.value = numberToIp(next) + '/' + lastParsed.prefix;
+            if (lastParsed.mode === 'v6') {
+                const mask = v6PrefixToMask(lastParsed.prefix);
+                const size = 1n << BigInt(128 - lastParsed.prefix);
+                let next = v6NetworkOf(lastParsed.ip, mask) + BigInt(delta) * size;
+                // Wrap to 128-bit range.
+                next = ((next % (V6_MAX + 1n)) + (V6_MAX + 1n)) % (V6_MAX + 1n);
+                els.input.value = v6ToCanonical(next) + '/' + lastParsed.prefix;
+            } else {
+                const mask = prefixToMask(lastParsed.prefix);
+                const size = lastParsed.prefix === 0 ? 0 : (((~mask) >>> 0) + 1);
+                const next = (networkOf(lastParsed.ip, mask) + delta * size) >>> 0;
+                els.input.value = numberToIp(next) + '/' + lastParsed.prefix;
+            }
             update();
             bounce(delta > 0 ? 'up' : 'down');
         }
 
         function copyByKey(key) {
             if (!lastParsed) return;
-            const mask = prefixToMask(lastParsed.prefix);
-            const naMode = (lastParsed.prefix === 31 || lastParsed.prefix === 32);
+            const p = lastParsed;
+
+            if (p.mode === 'v6') {
+                const mask = v6PrefixToMask(p.prefix);
+                const net = v6NetworkOf(p.ip, mask);
+                const last = v6LastOf(p.ip, mask);
+                switch (key) {
+                    case 'c': copy(v6ToCanonical(net), els.network, 'network'); break;
+                    case 'C': copy(v6ToCanonical(net) + '/' + p.prefix, els.input, 'cidr'); break;
+                    case 'h': copy(v6ToCanonical(net), els.firstHost, 'first address'); break;
+                    case 'H': copy(v6ToCanonical(last), els.lastHost, 'last address'); break;
+                    case 'e': copy(v6ToExpanded(p.ip), els.expanded, 'expanded'); break;
+                }
+                return;
+            }
+
+            const mask = prefixToMask(p.prefix);
+            const naMode = (p.prefix === 31 || p.prefix === 32);
             switch (key) {
                 case 'c':
-                    if (!naMode) copy(numberToIp(networkOf(lastParsed.ip, mask)), els.network, 'network');
+                    if (!naMode) copy(numberToIp(networkOf(p.ip, mask)), els.network, 'network');
                     break;
                 case 'C':
-                    copy(numberToIp(networkOf(lastParsed.ip, mask)) + '/' + lastParsed.prefix, els.input, 'cidr');
+                    copy(numberToIp(networkOf(p.ip, mask)) + '/' + p.prefix, els.input, 'cidr');
                     break;
                 case 'b':
-                    if (!naMode) copy(numberToIp(broadcastOf(lastParsed.ip, mask)), els.broadcast, 'broadcast');
+                    if (!naMode) copy(numberToIp(broadcastOf(p.ip, mask)), els.broadcast, 'broadcast');
                     break;
                 case 'h':
-                    copy(numberToIp(firstHostOf(lastParsed.ip, mask, lastParsed.prefix)), els.firstHost, 'first host');
+                    copy(numberToIp(firstHostOf(p.ip, mask, p.prefix)), els.firstHost, 'first host');
                     break;
                 case 'H':
-                    copy(numberToIp(lastHostOf(lastParsed.ip, mask, lastParsed.prefix)), els.lastHost, 'last host');
+                    copy(numberToIp(lastHostOf(p.ip, mask, p.prefix)), els.lastHost, 'last host');
                     break;
                 case 'm':
                     copy(numberToIp(mask), els.dotSelect, 'mask');
@@ -787,6 +1031,7 @@ https://github.com/richard-gray/subcal
                 case 'm':
                 case 'w':
                 case 'x':
+                case 'e':
                     e.preventDefault();
                     copyByKey(e.key);
                     break;
@@ -802,7 +1047,8 @@ https://github.com/richard-gray/subcal
         els.vlsmPrefix.addEventListener('change', () => { renderVlsm(); els.vlsmList.classList.add('shown'); });
 
         [els.firstHost, els.lastHost, els.network, els.broadcast,
-         els.wildcard, els.hexmask, els.binary].forEach(wireCopy);
+         els.wildcard, els.hexmask, els.binary,
+         els.expanded, els.totalAddrs].forEach(wireCopy);
 
         els.helpOverlay.addEventListener('click', () => showHelp(false));
 
@@ -812,7 +1058,6 @@ https://github.com/richard-gray/subcal
             suppressHashWrite = false;
         });
 
-        generateDropdowns();
         readHash();
         update();
 
@@ -882,6 +1127,59 @@ https://github.com/richard-gray/subcal
             assertEq(parse('192.168.0.0/33'),          null,  'parse invalid prefix');
             assertEq(parse('192.168.0.0'),             null,  'parse missing prefix');
             assertEq(parse('not an ip'),               null,  'parse garbage');
+
+            // ---- IPv6 ----
+            // Canonical form.
+            assertEq(v6ToCanonical(0n),                       '::',          'v6 canon all zeros');
+            assertEq(v6ToCanonical(1n),                       '::1',         'v6 canon ::1');
+            const p1 = v6Parse('2001:db8::1/64');
+            assertEq(p1 !== null,                             true,          'v6 parse 2001:db8::1/64');
+            assertEq(p1.prefix,                               64,            'v6 prefix 64');
+            assertEq(v6ToCanonical(p1.ip),                    '2001:db8::1', 'v6 roundtrip 2001:db8::1');
+            assertEq(v6ToExpanded(p1.ip), '2001:0db8:0000:0000:0000:0000:0000:0001', 'v6 expanded');
+
+            // Network and last address.
+            const p2 = v6Parse('2001:db8::abcd:1234/64');
+            const m2 = v6PrefixToMask(p2.prefix);
+            assertEq(v6ToCanonical(v6NetworkOf(p2.ip, m2)),   '2001:db8::',                              'v6 /64 network');
+            assertEq(v6ToCanonical(v6LastOf(p2.ip, m2)),      '2001:db8::ffff:ffff:ffff:ffff',           'v6 /64 last');
+
+            // /127 (point-to-point).
+            const p3 = v6Parse('2001:db8::/127');
+            const m3 = v6PrefixToMask(p3.prefix);
+            assertEq(v6ToCanonical(v6NetworkOf(p3.ip, m3)),   '2001:db8::',   'v6 /127 network');
+            assertEq(v6ToCanonical(v6LastOf(p3.ip, m3)),      '2001:db8::1',  'v6 /127 last');
+
+            // /128 single host.
+            const p4 = v6Parse('2001:db8::1/128');
+            const m4 = v6PrefixToMask(p4.prefix);
+            assertEq(v6ToCanonical(v6NetworkOf(p4.ip, m4)),   '2001:db8::1',  'v6 /128 network');
+            assertEq(v6PrefixToMask(128) === V6_MAX,          true,           'v6 /128 mask');
+            assertEq(v6PrefixToMask(0) === 0n,                true,           'v6 /0 mask');
+
+            // Parsing edge cases.
+            assertEq(v6Parse('::/0') !== null,                true,           'v6 parse ::/0');
+            assertEq(v6Parse('::1/128') !== null,             true,           'v6 parse ::1/128');
+            assertEq(v6Parse('2001:db8::/48') !== null,       true,           'v6 parse /48');
+            assertEq(v6Parse('2001::db8::1/64'),              null,           'v6 reject double ::');
+            assertEq(v6Parse('gggg::/64'),                    null,           'v6 reject non-hex');
+            assertEq(v6Parse('2001:db8::/129'),               null,           'v6 reject /129');
+            assertEq(v6Parse('2001:db8:0:0:0:0:0:0:1/64'),    null,           'v6 reject 9 hextets');
+            assertEq(v6Parse('1:2:3:4:5:6:7:8/64') !== null,  true,           'v6 parse full 8 hextets');
+
+            // Dispatch.
+            assertEq(parse('2001:db8::/48').mode,             'v6',           'dispatch v6');
+            assertEq(parse('192.168.0.0/24').mode,            'v4',           'dispatch v4');
+
+            // RFC 5952 4.2.3: longer run of zero hextets wins.
+            const longerSecond = hextetsToBigInt([0x2001, 0, 0, 1, 0, 0, 0, 0x5678]);
+            assertEq(v6ToCanonical(longerSecond),             '2001:0:0:1::5678',      'v6 canon longer run wins');
+            // RFC 5952 4.2.3: when runs tie, the first one wins.
+            const tieIp = hextetsToBigInt([0x2001, 0, 0, 1, 0, 0, 0x1234, 0x5678]);
+            assertEq(v6ToCanonical(tieIp),                    '2001::1:0:0:1234:5678', 'v6 canon tie -> first');
+            // Single zero hextet must not be compressed (need 2+).
+            const singleZeroIp = hextetsToBigInt([0x2001, 0xdb8, 0, 1, 2, 3, 4, 5]);
+            assertEq(v6ToCanonical(singleZeroIp),             '2001:db8:0:1:2:3:4:5',  'v6 canon no single-zero shorten');
 
             if (fails.length) {
                 console.error('subcal: ' + fails.length + ' self-test failure(s):');
