@@ -10,7 +10,9 @@ https://github.com/richard-gray/subcal
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>SubCal.io</title>
+    <meta name="description" content="Keyboard-driven IPv4 and IPv6 subnet calculator. Click any value to copy. Arrow keys to navigate. Single static page, no tracking, no dependencies.">
+    <meta name="theme-color" content="#000000">
+    <title>SubCal.io &mdash; subnet calculator</title>
     <style>
         :root {
             --bg: #ffffff;
@@ -633,7 +635,7 @@ https://github.com/richard-gray/subcal
 
             els.slashSelect.value  = String(p.prefix);
             els.dotSelect.value    = String(p.prefix);
-            els.usableSelect.value = p.prefix === 30 ? '31' : String(p.prefix);
+            els.usableSelect.value = String(p.prefix);
 
             if (p.prefix === 31 || p.prefix === 32) {
                 setOutput(els.network,   'n/a', true);
@@ -707,12 +709,14 @@ https://github.com/richard-gray/subcal
                     dotOpt.text = numberToIp(prefixToMask(x));
                     els.dotSelect.add(dotOpt);
 
-                    if (x !== 30) {
-                        const usableOpt = document.createElement('option');
-                        usableOpt.value = String(x);
-                        usableOpt.text = String(usableCount(x));
-                        els.usableSelect.add(usableOpt);
-                    }
+                    const usableOpt = document.createElement('option');
+                    usableOpt.value = String(x);
+                    // /30 and /31 both have 2 "usable" addresses — disambiguate.
+                    if (x === 30)      usableOpt.text = '2 (/30)';
+                    else if (x === 31) usableOpt.text = '2 (/31 ptp)';
+                    else if (x === 32) usableOpt.text = '1 (/32 host)';
+                    else               usableOpt.text = String(usableCount(x));
+                    els.usableSelect.add(usableOpt);
                 }
             } else {
                 for (let x = 128; x >= 0; x--) {
