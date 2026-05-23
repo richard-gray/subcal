@@ -1,493 +1,897 @@
-<!-- 
+<!DOCTYPE html>
+<!--
 Richard Gray
 2022
 @goodgigs
 https://github.com/richard-gray/subcal
- -->
-<html>
+-->
+<html lang="en">
 
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>SubCal.io</title>
     <style>
+        :root {
+            --bg: #ffffff;
+            --fg: #000000;
+            --nav-bg: #000000;
+            --nav-fg: #ffffff;
+            --hover-bg: #f0f0f0;
+            --copied-bg: #b6f5b6;
+            --error-bg: #f54242;
+            --muted: #888;
+            --border: #ddd;
+            --link: #0066cc;
+            --net-bit: #1853b8;
+            --host-bit: #999;
+            --panel-bg: #fafafa;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0d0d0d;
+                --fg: #e8e8e8;
+                --nav-bg: #1a1a1a;
+                --nav-fg: #f0f0f0;
+                --hover-bg: #2a2a2a;
+                --copied-bg: #2a6b2a;
+                --error-bg: #7a2828;
+                --muted: #666;
+                --border: #333;
+                --link: #6aa6ff;
+                --net-bit: #7fb1ff;
+                --host-bit: #888;
+                --panel-bg: #161616;
+            }
+        }
+
         body {
-            background-color: rgb(255, 255, 255);
-            margin: 0em;
-            padding: 0em;
-            font-family: monospace
+            background-color: var(--bg);
+            color: var(--fg);
+            margin: 0;
+            padding: 0;
+            font-family: monospace;
         }
-        
+
         #page {
-            margin: auto;
-            width: 60em;
+            max-width: 60em;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 0.5em 4em;
+            box-sizing: border-box;
         }
-        
+
         #nav {
-            background-color: black;
+            background-color: var(--nav-bg);
             padding-left: 0.2em;
-            margin-bottom: 0.5em;
+            margin: 0 -0.5em 0.5em;
         }
-        
+
+        #heading1, #heading2 {
+            color: var(--nav-fg);
+            font-size: 5em;
+            font-weight: normal;
+            font-family: monospace;
+            overflow: hidden;
+            white-space: nowrap;
+            letter-spacing: 0;
+            height: 1.25em;
+            display: inline-block;
+            vertical-align: top;
+        }
+
         #heading1 {
-            color: white;
-            font-size: 5em;
-            font-weight: normal;
-            font-family: monospace;
-            overflow: hidden;
-            white-space: nowrap;
-            letter-spacing: 0em;
             width: 6em;
-            height: 1.25em;
             animation: typing 1.5s steps(12, end);
-            display: inline-block;
         }
-        
-        @keyframes typing {
-            from {
-                width: 0em;
-            }
-            to {
-                width: 6.6em;
-            }
-        }
-        
         #heading2 {
-            color: white;
-            font-size: 5em;
-            font-weight: normal;
-            font-family: monospace;
-            overflow: hidden;
-            white-space: nowrap;
-            letter-spacing: 0em;
             width: 6.6em;
-            height: 1.25em;
             animation: blink-caret .75s step-end infinite;
-            display: inline-block;
         }
-        
-        @keyframes blink-caret {
-            from,
-            to {
-                width: 0em;
-            }
-            50% {
-                width: 0.6em;
-            }
+
+        @keyframes typing { from { width: 0; } to { width: 6.6em; } }
+        @keyframes blink-caret { from, to { width: 0; } 50% { width: 0.6em; } }
+
+        @media (max-width: 480px) {
+            #heading1, #heading2 { font-size: 2.5em; }
+            #heading1 { width: 6em; }
+            #heading2 { width: 6.6em; }
         }
-        
-        #footer {
-            color: rgb(0, 0, 0);
-            margin-left: 0.1em;
-            font-size: 1em;
-            position: absolute;
-            bottom: 0.1em;
-            right: 0.1em;
-        }
-        
+
         table {
             font-size: 2em;
             font-family: monospace;
+            width: 100%;
+            border-collapse: collapse;
         }
-        
+        td { padding: 0.05em 0.1em; vertical-align: middle; }
+
+        @media (max-width: 600px) {
+            table { font-size: 1.4em; }
+        }
+
+        input, select {
+            font-family: monospace;
+            background: var(--bg);
+            color: var(--fg);
+            border: 1px solid var(--border);
+        }
         input {
             font-size: 1.5em;
             width: 100%;
-            font-family: monospace;
+            box-sizing: border-box;
+            padding: 0.1em 0.2em;
         }
-        
-        input.bounceup {
-            font-size: 1.5em;
-            width: 100%;
-            font-family: monospace;
-            animation: bounceup 0.2s cubic-bezier(.52, -0.37, .47, 1.21)
+        select {
+            font-size: 1em;
+            padding: 0.1em;
         }
-        
-        input.bouncedown {
-            font-size: 1.5em;
-            width: 100%;
-            font-family: monospace;
-            animation: bouncedown 0.2s cubic-bezier(.52, -0.37, .47, 1.21)
+
+        input.bounceup    { animation: bounceup    0.2s cubic-bezier(.52, -0.37, .47, 1.21); }
+        input.bouncedown  { animation: bouncedown  0.2s cubic-bezier(.52, -0.37, .47, 1.21); }
+        input.bounceright { animation: bounceright 0.2s cubic-bezier(.52, -0.37, .47, 1.21); }
+        input.bounceleft  { animation: bounceleft  0.2s cubic-bezier(.52, -0.37, .47, 1.21); }
+        @keyframes bounceup    { from, to {} 50% { transform: translateY(-3px); } }
+        @keyframes bouncedown  { from, to {} 50% { transform: translateY( 3px); } }
+        @keyframes bounceright { from, to {} 50% { transform: translateX( 3px); } }
+        @keyframes bounceleft  { from, to {} 50% { transform: translateX(-3px); } }
+
+        .span3 { width: 30em; max-width: 100%; }
+        .span1 { width: 10em; }
+
+        .copyable {
+            cursor: pointer;
+            user-select: all;
+            border-radius: 2px;
+            padding: 0 0.15em;
+            transition: background-color 0.15s;
+            display: inline-block;
+            min-width: 1em;
         }
-        
-        input.bounceright {
-            font-size: 1.5em;
-            width: 100%;
-            font-family: monospace;
-            animation: bounceright 0.2s cubic-bezier(.52, -0.37, .47, 1.21)
+        .copyable:hover { background-color: var(--hover-bg); }
+        .copyable.copied { background-color: var(--copied-bg); }
+        .copyable.na { cursor: default; user-select: none; color: var(--muted); }
+        .copyable.na:hover { background-color: transparent; }
+
+        #binaryrow td { padding-top: 0.3em; }
+        .binary {
+            font-size: 0.7em;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+            overflow-x: auto;
+            display: inline-block;
+            max-width: 100%;
         }
-        
-        input.bounceleft {
-            font-size: 1.5em;
-            width: 100%;
-            font-family: monospace;
-            animation: bounceleft 0.2s cubic-bezier(.52, -0.37, .47, 1.21)
+        .binary .net  { color: var(--net-bit); font-weight: bold; }
+        .binary .host { color: var(--host-bit); }
+        .binary .sep  { color: var(--muted); }
+
+        #vlsm {
+            margin-top: 1.5em;
+            border-top: 1px solid var(--border);
+            padding-top: 0.5em;
         }
-        
-        @keyframes bounceup {
-            from,
-            to {}
-            50% {
-                transform: translateY(-3px);
-            }
+        #vlsm h2 {
+            font-size: 1em;
+            margin: 0 0 0.3em;
+            color: var(--muted);
+            font-weight: normal;
         }
-        
-        @keyframes bouncedown {
-            from,
-            to {}
-            50% {
-                transform: translateY(3px);
-            }
+        #vlsm-controls { font-size: 1em; margin-bottom: 0.5em; }
+        #vlsm-controls select { font-size: 1em; }
+        #vlsm-list {
+            font-size: 0.95em;
+            max-height: 16em;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            background: var(--panel-bg);
+            padding: 0.25em;
+            display: none;
         }
-        
-        @keyframes bounceright {
-            from,
-            to {}
-            50% {
-                transform: translateX(3px);
-            }
+        #vlsm-list.shown { display: block; }
+        .vlsm-row {
+            display: grid;
+            grid-template-columns: 14em 1fr;
+            gap: 0.5em;
+            padding: 0.1em 0.2em;
         }
-        
-        @keyframes bounceleft {
-            from,
-            to {}
-            50% {
-                transform: translateX(-3px);
-            }
-        }
-        
-        select,
+        .vlsm-row:hover { background: var(--hover-bg); }
+        .vlsm-cidr { font-weight: bold; }
+        .vlsm-range { color: var(--muted); }
+        #vlsm-count { color: var(--muted); margin-left: 0.5em; }
+
         #hint {
             font-size: 1em;
             font-family: monospace;
+            margin-top: 0.5em;
+            color: var(--muted);
         }
-        
-        .arrow {
-            font-size: 2em;
+        #words { font-size: 1em; }
+        a { color: var(--link); }
+
+        #footer {
+            color: var(--muted);
+            font-size: 0.85em;
+            position: fixed;
+            bottom: 0.3em;
+            right: 0.5em;
         }
-        
-        #colspan3 {
-            width: 30em;
+
+        #toast {
+            position: fixed;
+            bottom: 1.5em;
+            left: 50%;
+            transform: translateX(-50%) translateY(2em);
+            background: #222;
+            color: #fff;
+            padding: 0.5em 1em;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s, transform 0.15s;
+            z-index: 100;
         }
-        
-        #colspan1 {
-            width: 10em;
+        #toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        #help-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+        #help-overlay.shown { display: flex; }
+        #help-panel {
+            background: var(--bg);
+            color: var(--fg);
+            border: 1px solid var(--border);
+            padding: 1em 1.5em;
+            font-family: monospace;
+            max-width: 30em;
+            width: 90%;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+        }
+        #help-panel h2 { margin: 0 0 0.5em; font-size: 1.2em; }
+        #help-panel table { font-size: 0.95em; }
+        #help-panel td { padding: 0.15em 0.5em; }
+        #help-panel kbd {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 0.05em 0.4em;
+            font-family: monospace;
+            font-size: 0.95em;
+            color: var(--fg);
+        }
+        #help-close {
+            margin-top: 1em;
+            font-size: 0.85em;
+            color: var(--muted);
         }
     </style>
-    <script type="text/javascript">
-        function update() {
-            if (!(subnetslashdropdown.children.length > 0) && !(usableaddressesdropdown.children.length > 0)) {
-                GenerateDropdowns()
-            }
-            validation = ValidateIPaddress(inputvalue.value)
-            if (validation[0] && validation[1]) {
-                inputvalue.style.background = "";
-                ipaddress = inputvalue.value.split("/")[0]
-                binaryipaddress = ConvertIpToBinary(ipaddress)
-                ipaddressnumber = parseInt(binaryipaddress, 2).toString(10)
-                subnetlength = inputvalue.value.split("/")[1]
-                binarysubnetmask = ConvertSubnetToBinary(subnetlength)
-                subnetmasknumber = parseInt(binarysubnetmask, 2).toString(10) >>> 0
-                subnetslashdropdown.value = subnetlength
-                subnetdotdropdown.value = subnetlength
-                firsthostaddress.innerText = FirstUsableHost(ipaddressnumber, subnetmasknumber)
-                lasthostaddress.innerText = LastUsableHost(ipaddressnumber, subnetmasknumber)
-                if (subnetlength == 30) {
-                    usableaddressesdropdown.value = "31"
-                } else {
-                    usableaddressesdropdown.value = subnetlength
-                }
-                if (subnetlength == 31 || subnetlength == 32) {
-                    networkaddressdiv.innerText = "n/a"
-                    broadcastaddress.innerText = "n/a"
-                } else {
-                    networkaddressdiv.innerText = NetworkAddress(ipaddressnumber, subnetmasknumber)
-                    broadcastaddress.innerText = BroadcastAddress(ipaddressnumber, subnetmasknumber)
-                }
-            } else {
-                inputvalue.style.background = "#f54242";
-            }
-        }
-
-        function updatesubnetslashdropdown() {
-            inputtemp = inputvalue.value.split("/")[0] + "/" + subnetslashdropdown.value
-            validation = ValidateIPaddress(inputtemp)
-            if (validation[0] && validation[1]) {
-                inputvalue.style.background = "";
-                inputvalue.value = inputtemp
-                subnetslashdropdown.value = inputvalue.value.split("/")[1]
-                update()
-            } else {
-                inputvalue.style.background = "#f54242";
-            }
-        }
-
-        function updatesubnetdotdropdown() {
-            inputtemp = inputvalue.value.split("/")[0] + "/" + subnetdotdropdown.value
-            validation = ValidateIPaddress(inputtemp)
-            if (validation[0] && validation[1]) {
-                inputvalue.style.background = "";
-                inputvalue.value = inputtemp
-                subnetdotdropdown.value = inputvalue.value.split("/")[1]
-                update()
-            } else {
-                inputvalue.style.background = "#f54242";
-            }
-        }
-
-        function updateusableaddressesdropdown() {
-            inputtemp = inputvalue.value.split("/")[0] + "/" + usableaddressesdropdown.value
-            validation = ValidateIPaddress(inputtemp)
-            if (validation[0] && validation[1]) {
-                inputvalue.style.background = "";
-                inputvalue.value = inputtemp
-                update()
-            } else {
-                inputvalue.style.background = "#f54242";
-            }
-        }
-
-        function ValidateIPaddress(ipaddress) {
-
-            var ip, subnet = false
-            if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?:\/((3[0-2])|([0-2]?[0-9]{1,1})))?$/.test(ipaddress)) {
-                ip = true
-            }
-            if (/\/((3[0-2])|([0-2]?[0-9]{1,1}))$/.test(ipaddress)) {
-                subnet = true
-            }
-            return [ip, subnet]
-
-        }
-
-        function ConvertIpToBinary(ipaddress) {
-            var octets = ipaddress.split(".")
-            return ConvertToByte(octets[0]) + ConvertToByte(octets[1]) + ConvertToByte(octets[2]) + ConvertToByte(octets[3])
-        }
-
-        function ConvertIpNumberToIpAddress(ipaddressnumber) {
-            var octet = ipaddressnumber.toString(2).padStart(32, "0").match(/.{1,8}/g)
-            return parseInt(octet[0], 2).toString(10) + "." + parseInt(octet[1], 2).toString(10) + "." + parseInt(octet[2], 2).toString(10) + "." + parseInt(octet[3], 2).toString(10)
-        }
-
-        function ConvertSubnetToBinary(subnetlength) {
-            return ((2 ** subnetlength) - 1).toString(2).padEnd(32, "0")
-        }
-
-        function NetworkAddress(ipaddressnumber, subnetmasknumber) {
-            networkaddress = (ipaddressnumber & subnetmasknumber) >>> 0
-            return ConvertIpNumberToIpAddress(networkaddress)
-        }
-
-        function FirstUsableHost(ipaddressnumber, subnetmasknumber) {
-            firsthost = (ipaddressnumber & subnetmasknumber) >>> 0
-            if (subnetmasknumber == 4294967294 || subnetmasknumber == 4294967295) {
-                return ConvertIpNumberToIpAddress(firsthost)
-            } else {
-                return ConvertIpNumberToIpAddress(firsthost + 1)
-            }
-        }
-
-        function BroadcastAddress(ipaddressnumber, subnetmasknumber) {
-            network = (ipaddressnumber & subnetmasknumber) >>> 0
-            invertedsubnetmask = InvertBinary(subnetmasknumber, 32)
-            lasthost = (network | invertedsubnetmask) >>> 0
-            return ConvertIpNumberToIpAddress(lasthost)
-        }
-
-        function LastUsableHost(ipaddressnumber, subnetmasknumber) {
-            network = (ipaddressnumber & subnetmasknumber) >>> 0
-            invertedsubnetmask = InvertBinary(subnetmasknumber, 32)
-            lasthost = (network | invertedsubnetmask) >>> 0
-            if (subnetmasknumber == 4294967294 || subnetmasknumber == 4294967295) {
-                return ConvertIpNumberToIpAddress(lasthost)
-            } else {
-                return ConvertIpNumberToIpAddress(lasthost - 1)
-            }
-        }
-
-        function UsableAddresses(subnetlength) {
-            switch (subnetlength) {
-                case '31':
-                    return 2
-                case '32':
-                    return 1
-                default:
-                    return ((2 ** (32 - subnetlength)) - 2);
-            }
-        }
-
-        function ConvertToByte(number) {
-            return (number >>> 0).toString(2).padStart(8, "0")
-        }
-
-        function InvertBinary(number, digits) {
-            return ~number & (Math.pow(2, digits) - 1)
-        }
-
-        function CopyToClipboard(element) {
-            var $temp = $("<input>");
-            $("body").append($temp);
-            $temp.val($(element).text()).select();
-            document.execCommand("copy");
-            $temp.remove();
-        }
-
-        function GenerateDropdowns() {
-            var subnetslashdropdownoption = []
-            var subnetdotdropdownoption = []
-            var usableaddressesdropdownoption = []
-            for (x = 32; x > 0; x--) {
-                y = 33 - x
-                subnetslashdropdownoption[x] = document.createElement("option")
-                subnetslashdropdownoption[x].value = x.toString()
-                subnetslashdropdownoption[x].text = "/" + x.toString()
-                subnetslashdropdown.add(subnetslashdropdownoption[x])
-                subnetdotdropdownoption[x] = document.createElement("option")
-                subnetdotdropdownoption[x].value = x.toString()
-                subnetdotdropdownoption[x].text = ConvertIpNumberToIpAddress(parseInt(ConvertSubnetToBinary(x), 2).toString(10) >>> 0)
-                subnetdotdropdown.add(subnetdotdropdownoption[x])
-                if (x != 30) {
-                    usableaddressesdropdownoption[x] = document.createElement("option")
-                    usableaddressesdropdownoption[x].value = x.toString()
-                    usableaddressesdropdownoption[x].text = UsableAddresses((33 - y).toString())
-                    usableaddressesdropdown.add(usableaddressesdropdownoption[x])
-                }
-            }
-        }
-
-        document.onkeydown = function(e) {
-            if (inputvalue.classList.value.includes("bounceup")) {
-                inputvalue.classList.remove("bounceup")
-            }
-            if (inputvalue.classList.value.includes("bouncedown")) {
-                inputvalue.classList.remove("bouncedown")
-            }
-            if (inputvalue.classList.value.includes("bounceright")) {
-                inputvalue.classList.remove("bounceright")
-            }
-            if (inputvalue.classList.value.includes("bounceleft")) {
-                inputvalue.classList.remove("bounceleft")
-            }
-            switch (e.keyCode) {
-                case 40:
-                    ipaddress = inputvalue.value.split("/")[0]
-                    binaryipaddress = ConvertIpToBinary(ipaddress)
-                    ipaddressnumber = parseInt(binaryipaddress, 2).toString(10)
-                    subnetlength = inputvalue.value.split("/")[1]
-                    binarysubnetmask = ConvertSubnetToBinary(subnetlength)
-                    subnetmasknumber = parseInt(binarysubnetmask, 2).toString(10)
-                    networkaddress = (ipaddressnumber & subnetmasknumber) >>> 0
-                    nextnetworkaddress = (ipaddressnumber >>> 0) - (InvertBinary(subnetmasknumber, 32) >>> 0)
-                    inputvalue.value = NetworkAddress(nextnetworkaddress, subnetmasknumber) + "/" + subnetlength
-                    update()
-                    void inputvalue.offsetWidth;
-                    inputvalue.classList.add("bouncedown")
-                    break;
-                case 39:
-                    if (document.activeElement.id != "inputvalue") {
-                        inputvalue.value = inputvalue.value.split("/")[0] + "/" + (parseInt(inputvalue.value.split("/")[1], 10) + 1)
-                        update()
-                        void inputvalue.offsetWidth;
-                        inputvalue.classList.add("bounceright")
-                    }
-                    break;
-                case 38:
-                    ipaddress = inputvalue.value.split("/")[0]
-                    binaryipaddress = ConvertIpToBinary(ipaddress)
-                    ipaddressnumber = parseInt(binaryipaddress, 2).toString(10)
-                    subnetlength = inputvalue.value.split("/")[1]
-                    binarysubnetmask = ConvertSubnetToBinary(subnetlength)
-                    subnetmasknumber = parseInt(binarysubnetmask, 2).toString(10)
-                    networkaddress = (ipaddressnumber & subnetmasknumber) >>> 0
-                    nextnetworkaddress = (ipaddressnumber >>> 0) + ((InvertBinary(subnetmasknumber, 32) >>> 0) + 1)
-                    inputvalue.value = NetworkAddress(nextnetworkaddress, subnetmasknumber) + "/" + subnetlength
-                    update()
-                    void inputvalue.offsetWidth;
-                    inputvalue.classList.add("bounceup")
-                    break;
-                case 37:
-
-                    if (document.activeElement.id != "inputvalue") {
-                        inputvalue.value = inputvalue.value.split("/")[0] + "/" + (parseInt(inputvalue.value.split("/")[1], 10) - 1)
-                        update()
-                        void inputvalue.offsetWidth;
-                        inputvalue.classList.add("bounceleft")
-                    }
-                    break;
-            }
-        }
-    </script>
-
 </head>
 
-<body onload="update()">
+<body>
     <div id='page'>
         <div id='nav'>
-            <div id="heading1">subcal.io ></div>
-            <div id="heading2">_</div>
+            <div id="heading1">subcal.io &gt;</div><div id="heading2">_</div>
         </div>
         <div id='calculator'>
             <table>
                 <tr>
-                    <td colspan="3" id="colspan3">
-                        <input id="inputvalue" type="text" value="192.168.0.0/24" onchange="update()" oninput="update()"></input>
+                    <td colspan="3" class="span3">
+                        <input id="inputvalue" type="text" value="192.168.0.0/24" autocomplete="off" spellcheck="false" autocapitalize="off" autocorrect="off" aria-label="IP address with CIDR prefix">
                     </td>
                 </tr>
                 <tr>
-                    <td id="colspan1">
-                        <div class="heading">Host Range</div>
-                    </td>
-                    <td id="colspan1">
-                        <div id="firsthostaddress"></div>
-                    </td>
-                    <td id="colspan1">
-                        <div id="lasthostaddress"></div>
-                    </td>
+                    <td class="span1"><div class="heading">Host Range</div></td>
+                    <td class="span1"><div class="copyable" id="firsthostaddress" title="Click to copy"></div></td>
+                    <td class="span1"><div class="copyable" id="lasthostaddress" title="Click to copy"></div></td>
                 </tr>
                 <tr>
-                    <td>
-                        <div class="heading">Subnet Mask</div>
-                    </td>
-                    <td>
-                        <!-- <div id="subnetmask"></div> -->
-                        <select id="subnetslashdropdown" onchange="updatesubnetslashdropdown()" oninput="updatesubnetslashdropdown()"></select>
-                    </td>
-                    <td>
-                        <select id="subnetdotdropdown" onchange="updatesubnetdotdropdown()" oninput="updatesubnetdotdropdown()"></select>
-                    </td>
+                    <td><div class="heading">Subnet Mask</div></td>
+                    <td><select id="subnetslashdropdown" aria-label="Subnet prefix length"></select></td>
+                    <td><select id="subnetdotdropdown" aria-label="Subnet mask (dotted decimal)"></select></td>
                 </tr>
                 <tr>
-                    <td>
-                        <div class="heading">Usable Addresses</div>
-                    </td>
-                    <td>
-                        <!-- <div id="usableaddresses"></div> -->
-                        <select id="usableaddressesdropdown" onchange="updateusableaddressesdropdown()" oninput="updateusableaddressesdropdown()"></select>
-                    </td>
+                    <td><div class="heading">Usable Addresses</div></td>
+                    <td><select id="usableaddressesdropdown" aria-label="Usable address count"></select></td>
                 </tr>
                 <tr>
-                    <td>
-                        <div class="heading">Network Address</div>
-                    </td>
-                    <td>
-                        <div class="item" id="networkaddressdiv"></div>
-                    </td>
+                    <td><div class="heading">Network Address</div></td>
+                    <td><div class="copyable" id="networkaddressdiv" title="Click to copy"></div></td>
                 </tr>
                 <tr>
-                    <td>
-                        <div class="heading">Broadcast Address</div>
-                    </td>
-                    <td>
-                        <div class="item" id="broadcastaddress"></div>
-                    </td>
+                    <td><div class="heading">Broadcast Address</div></td>
+                    <td><div class="copyable" id="broadcastaddress" title="Click to copy"></div></td>
+                </tr>
+                <tr>
+                    <td><div class="heading">Wildcard Mask</div></td>
+                    <td><div class="copyable" id="wildcardmask" title="Click to copy"></div></td>
+                </tr>
+                <tr>
+                    <td><div class="heading">Hex Mask</div></td>
+                    <td><div class="copyable" id="hexmask" title="Click to copy"></div></td>
+                </tr>
+                <tr id="binaryrow">
+                    <td><div class="heading">Binary</div></td>
+                    <td colspan="2"><div class="binary copyable" id="binaryview" title="Click to copy"></div></td>
                 </tr>
             </table>
         </div>
-        <div id="words">
-            <br><br>Please contribute! https://github.com/richard-gray/subcal<br>
+
+        <div id="vlsm">
+            <h2>Split this subnet:</h2>
+            <div id="vlsm-controls">
+                into
+                <select id="vlsm-prefix" aria-label="Child subnet prefix length"></select>
+                subnets
+                <span id="vlsm-count"></span>
+            </div>
+            <div id="vlsm-list" aria-live="polite"></div>
         </div>
-        <div id='hint'>*Tip try using the arrow keys*</div>
-        <div id='footer'>Richard Gray @goodgigs subcal.io</div>
+
+        <div id="words">
+            <br>Please contribute! <a href="https://github.com/richard-gray/subcal" target="_blank" rel="noopener">github.com/richard-gray/subcal</a>
+        </div>
+        <div id='hint'>arrow keys step subnets &middot; click any value to copy &middot; press <kbd>?</kbd> for shortcuts</div>
     </div>
+    <div id='footer'>Richard Gray @goodgigs subcal.io</div>
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <div id="help-overlay" role="dialog" aria-label="Keyboard shortcuts" aria-modal="true">
+        <div id="help-panel">
+            <h2>Keyboard shortcuts</h2>
+            <table>
+                <tr><td><kbd>&#8593;</kbd> / <kbd>&#8595;</kbd></td><td>next / previous subnet</td></tr>
+                <tr><td><kbd>&#8594;</kbd> / <kbd>&#8592;</kbd></td><td>grow / shrink prefix length</td></tr>
+                <tr><td><kbd>]</kbd> / <kbd>[</kbd></td><td>same as &rarr; / &larr;</td></tr>
+                <tr><td><kbd>c</kbd></td><td>copy network address</td></tr>
+                <tr><td><kbd>C</kbd></td><td>copy CIDR (network/prefix)</td></tr>
+                <tr><td><kbd>b</kbd></td><td>copy broadcast address</td></tr>
+                <tr><td><kbd>h</kbd></td><td>copy first host</td></tr>
+                <tr><td><kbd>H</kbd></td><td>copy last host</td></tr>
+                <tr><td><kbd>m</kbd></td><td>copy subnet mask</td></tr>
+                <tr><td><kbd>w</kbd></td><td>copy wildcard mask</td></tr>
+                <tr><td><kbd>x</kbd></td><td>copy hex mask</td></tr>
+                <tr><td><kbd>v</kbd></td><td>toggle VLSM list</td></tr>
+                <tr><td><kbd>/</kbd></td><td>focus address input</td></tr>
+                <tr><td><kbd>?</kbd></td><td>this help</td></tr>
+                <tr><td><kbd>Esc</kbd></td><td>close / blur</td></tr>
+            </table>
+            <div id="help-close">click anywhere or press <kbd>Esc</kbd> to close</div>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        'use strict';
+
+        // ---------- DOM refs ----------
+        const $ = (id) => document.getElementById(id);
+        const els = {
+            input:        $('inputvalue'),
+            slashSelect:  $('subnetslashdropdown'),
+            dotSelect:    $('subnetdotdropdown'),
+            usableSelect: $('usableaddressesdropdown'),
+            firstHost:    $('firsthostaddress'),
+            lastHost:     $('lasthostaddress'),
+            network:      $('networkaddressdiv'),
+            broadcast:    $('broadcastaddress'),
+            wildcard:     $('wildcardmask'),
+            hexmask:      $('hexmask'),
+            binary:       $('binaryview'),
+            vlsmPrefix:   $('vlsm-prefix'),
+            vlsmCount:    $('vlsm-count'),
+            vlsmList:     $('vlsm-list'),
+            toast:        $('toast'),
+            helpOverlay:  $('help-overlay'),
+        };
+
+        // ---------- Pure math (IPv4 / uint32) ----------
+        function ipToNumber(ip) {
+            const parts = ip.split('.');
+            return ((parseInt(parts[0], 10) << 24) |
+                    (parseInt(parts[1], 10) << 16) |
+                    (parseInt(parts[2], 10) << 8)  |
+                     parseInt(parts[3], 10)) >>> 0;
+        }
+        function numberToIp(n) {
+            return [(n >>> 24) & 0xff, (n >>> 16) & 0xff, (n >>> 8) & 0xff, n & 0xff].join('.');
+        }
+        function prefixToMask(prefix) {
+            return prefix === 0 ? 0 : (0xFFFFFFFF << (32 - prefix)) >>> 0;
+        }
+        function wildcardOf(mask) { return (~mask) >>> 0; }
+        function networkOf(ip, mask)   { return (ip & mask) >>> 0; }
+        function broadcastOf(ip, mask) { return ((ip & mask) | wildcardOf(mask)) >>> 0; }
+        function firstHostOf(ip, mask, prefix) {
+            return prefix >= 31 ? networkOf(ip, mask) : (networkOf(ip, mask) + 1) >>> 0;
+        }
+        function lastHostOf(ip, mask, prefix) {
+            return prefix >= 31 ? broadcastOf(ip, mask) : (broadcastOf(ip, mask) - 1) >>> 0;
+        }
+        function usableCount(prefix) {
+            if (prefix === 32) return 1;
+            if (prefix === 31) return 2;
+            return Math.pow(2, 32 - prefix) - 2;
+        }
+        function toHex32(n) {
+            return '0x' + n.toString(16).toUpperCase().padStart(8, '0');
+        }
+        function toBin8(n) {
+            return (n >>> 0).toString(2).padStart(8, '0');
+        }
+
+        // ---------- Parsing / validation ----------
+        const cidrRe = /^(25[0-5]|2[0-4]\d|1?\d?\d)(\.(25[0-5]|2[0-4]\d|1?\d?\d)){3}\/([0-9]|[12]\d|3[0-2])$/;
+        function parse(value) {
+            value = (value || '').trim();
+            if (!cidrRe.test(value)) return null;
+            const [ipStr, prefixStr] = value.split('/');
+            return {
+                ipStr,
+                prefix: parseInt(prefixStr, 10),
+                ip: ipToNumber(ipStr),
+            };
+        }
+
+        // ---------- Output helpers ----------
+        function setOutput(el, text, isNa) {
+            el.textContent = text;
+            el.classList.toggle('na', !!isNa);
+        }
+        function setBinary(ip, prefix) {
+            const bits = (ip >>> 0).toString(2).padStart(32, '0');
+            const octets = [bits.slice(0, 8), bits.slice(8, 16), bits.slice(16, 24), bits.slice(24, 32)];
+            // Re-join with dots, and split at the prefix boundary.
+            let out = '';
+            let bitIdx = 0;
+            for (let o = 0; o < 4; o++) {
+                if (o > 0) out += '<span class="sep">.</span>';
+                for (let b = 0; b < 8; b++) {
+                    const cls = bitIdx < prefix ? 'net' : 'host';
+                    out += '<span class="' + cls + '">' + octets[o][b] + '</span>';
+                    bitIdx++;
+                }
+            }
+            els.binary.innerHTML = out;
+            // For copy purposes, store the plain text version.
+            els.binary.dataset.copy = octets.join('.');
+        }
+
+        // ---------- Render ----------
+        let lastParsed = null;
+        function render(p) {
+            if (!p) {
+                els.input.style.background = 'var(--error-bg)';
+                lastParsed = null;
+                return;
+            }
+            els.input.style.background = '';
+            lastParsed = p;
+
+            const mask = prefixToMask(p.prefix);
+            const wc   = wildcardOf(mask);
+
+            setOutput(els.firstHost, numberToIp(firstHostOf(p.ip, mask, p.prefix)));
+            setOutput(els.lastHost,  numberToIp(lastHostOf (p.ip, mask, p.prefix)));
+
+            els.slashSelect.value  = String(p.prefix);
+            els.dotSelect.value    = String(p.prefix);
+            els.usableSelect.value = p.prefix === 30 ? '31' : String(p.prefix);
+
+            if (p.prefix === 31 || p.prefix === 32) {
+                setOutput(els.network,   'n/a', true);
+                setOutput(els.broadcast, 'n/a', true);
+            } else {
+                setOutput(els.network,   numberToIp(networkOf(p.ip, mask)));
+                setOutput(els.broadcast, numberToIp(broadcastOf(p.ip, mask)));
+            }
+            setOutput(els.wildcard, numberToIp(wc));
+            setOutput(els.hexmask,  toHex32(mask));
+            setBinary(p.ip, p.prefix);
+
+            updateHash(p);
+            refreshVlsmPrefixOptions(p.prefix);
+            renderVlsm();
+        }
+
+        function update() {
+            render(parse(els.input.value));
+        }
+
+        // ---------- Dropdowns ----------
+        function generateDropdowns() {
+            for (let x = 32; x > 0; x--) {
+                const slashOpt = document.createElement('option');
+                slashOpt.value = String(x);
+                slashOpt.text = '/' + x;
+                els.slashSelect.add(slashOpt);
+
+                const dotOpt = document.createElement('option');
+                dotOpt.value = String(x);
+                dotOpt.text = numberToIp(prefixToMask(x));
+                els.dotSelect.add(dotOpt);
+
+                if (x !== 30) {
+                    const usableOpt = document.createElement('option');
+                    usableOpt.value = String(x);
+                    usableOpt.text = String(usableCount(x));
+                    els.usableSelect.add(usableOpt);
+                }
+            }
+        }
+        function setPrefixFromSelect(select) {
+            const ipStr = els.input.value.split('/')[0];
+            const candidate = ipStr + '/' + select.value;
+            if (parse(candidate)) {
+                els.input.value = candidate;
+                update();
+            } else {
+                els.input.style.background = 'var(--error-bg)';
+            }
+        }
+
+        // ---------- URL hash sync ----------
+        let suppressHashWrite = false;
+        function updateHash(p) {
+            if (suppressHashWrite) return;
+            const newHash = '#' + p.ipStr + '/' + p.prefix;
+            if (location.hash !== newHash) {
+                history.replaceState(null, '', newHash);
+            }
+        }
+        function readHash() {
+            const raw = location.hash.replace(/^#/, '');
+            if (!raw) return false;
+            if (parse(raw)) {
+                els.input.value = raw;
+                return true;
+            }
+            return false;
+        }
+
+        // ---------- Copy ----------
+        let toastTimer = null;
+        function showToast(text) {
+            els.toast.textContent = text;
+            els.toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => els.toast.classList.remove('show'), 1200);
+        }
+        function flashCopied(el) {
+            el.classList.add('copied');
+            setTimeout(() => el.classList.remove('copied'), 600);
+        }
+        async function copy(text, el, label) {
+            try {
+                await navigator.clipboard.writeText(text);
+                if (el) flashCopied(el);
+                showToast((label ? label + ': ' : 'copied: ') + text);
+            } catch (err) {
+                showToast('copy failed');
+                console.warn('Clipboard write failed:', err);
+            }
+        }
+        function wireCopy(el) {
+            el.addEventListener('click', () => {
+                if (el.classList.contains('na')) return;
+                const text = el.dataset.copy || el.textContent;
+                if (text) copy(text, el);
+            });
+        }
+
+        // ---------- VLSM splitter ----------
+        function refreshVlsmPrefixOptions(currentPrefix) {
+            const previous = els.vlsmPrefix.value;
+            els.vlsmPrefix.innerHTML = '';
+            // Allow target prefix in (current, 32].
+            for (let x = currentPrefix + 1; x <= 32; x++) {
+                const o = document.createElement('option');
+                o.value = String(x);
+                o.text = '/' + x;
+                els.vlsmPrefix.add(o);
+            }
+            if (els.vlsmPrefix.options.length === 0) {
+                els.vlsmPrefix.disabled = true;
+                els.vlsmCount.textContent = '(already at /32)';
+            } else {
+                els.vlsmPrefix.disabled = false;
+                // Restore previous selection if still valid; else pick a sensible default.
+                const want = parseInt(previous, 10);
+                if (!isNaN(want) && want > currentPrefix && want <= 32) {
+                    els.vlsmPrefix.value = previous;
+                } else {
+                    // Default to splitting in half: current + 1, or stay at current target if small.
+                    els.vlsmPrefix.value = String(Math.min(currentPrefix + 1, 32));
+                }
+                els.vlsmCount.textContent = '';
+            }
+        }
+
+        const MAX_VLSM_ROWS = 1024;
+        function renderVlsm() {
+            const p = lastParsed;
+            const list = els.vlsmList;
+            if (!p || !els.vlsmPrefix.value) {
+                list.innerHTML = '';
+                els.vlsmCount.textContent = '';
+                return;
+            }
+            const targetPrefix = parseInt(els.vlsmPrefix.value, 10);
+            if (targetPrefix <= p.prefix) {
+                list.innerHTML = '';
+                els.vlsmCount.textContent = '';
+                return;
+            }
+
+            const parentMask = prefixToMask(p.prefix);
+            const parentNet = networkOf(p.ip, parentMask);
+            const childMask = prefixToMask(targetPrefix);
+            const childSize = targetPrefix === 0 ? 0 : (((~childMask) >>> 0) + 1);
+            const totalChildren = Math.pow(2, targetPrefix - p.prefix);
+            const shown = Math.min(totalChildren, MAX_VLSM_ROWS);
+
+            els.vlsmCount.textContent = '(' + totalChildren.toLocaleString() + (totalChildren > shown ? ', showing first ' + shown : '') + ')';
+
+            const frag = document.createDocumentFragment();
+            for (let i = 0; i < shown; i++) {
+                const childNet = (parentNet + i * childSize) >>> 0;
+                const childBcast = (childNet | ((~childMask) >>> 0)) >>> 0;
+                const cidr = numberToIp(childNet) + '/' + targetPrefix;
+
+                let rangeText;
+                if (targetPrefix >= 31) {
+                    rangeText = numberToIp(childNet) + ' – ' + numberToIp(childBcast);
+                } else {
+                    rangeText = numberToIp((childNet + 1) >>> 0) + ' – ' + numberToIp((childBcast - 1) >>> 0);
+                }
+
+                const row = document.createElement('div');
+                row.className = 'vlsm-row';
+
+                const cidrSpan = document.createElement('span');
+                cidrSpan.className = 'vlsm-cidr copyable';
+                cidrSpan.title = 'Click to copy';
+                cidrSpan.textContent = cidr;
+                cidrSpan.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    copy(cidr, cidrSpan, 'cidr');
+                });
+
+                const rangeSpan = document.createElement('span');
+                rangeSpan.className = 'vlsm-range';
+                rangeSpan.textContent = rangeText;
+
+                row.appendChild(cidrSpan);
+                row.appendChild(rangeSpan);
+                frag.appendChild(row);
+            }
+            list.innerHTML = '';
+            list.appendChild(frag);
+        }
+        function toggleVlsmList() {
+            els.vlsmList.classList.toggle('shown');
+        }
+
+        // ---------- Keyboard ----------
+        function bounce(direction) {
+            ['bounceup', 'bouncedown', 'bounceleft', 'bounceright']
+                .forEach(c => els.input.classList.remove(c));
+            void els.input.offsetWidth;
+            els.input.classList.add('bounce' + direction);
+        }
+        function stepPrefix(delta) {
+            if (!lastParsed) return;
+            const newPrefix = lastParsed.prefix + delta;
+            if (newPrefix < 0 || newPrefix > 32) return;
+            els.input.value = lastParsed.ipStr + '/' + newPrefix;
+            update();
+            bounce(delta > 0 ? 'right' : 'left');
+        }
+        function stepSubnet(delta) {
+            if (!lastParsed) return;
+            const mask = prefixToMask(lastParsed.prefix);
+            const size = lastParsed.prefix === 0 ? 0 : (((~mask) >>> 0) + 1);
+            const next = (networkOf(lastParsed.ip, mask) + delta * size) >>> 0;
+            els.input.value = numberToIp(next) + '/' + lastParsed.prefix;
+            update();
+            bounce(delta > 0 ? 'up' : 'down');
+        }
+
+        function copyByKey(key) {
+            if (!lastParsed) return;
+            const mask = prefixToMask(lastParsed.prefix);
+            const naMode = (lastParsed.prefix === 31 || lastParsed.prefix === 32);
+            switch (key) {
+                case 'c':
+                    if (!naMode) copy(numberToIp(networkOf(lastParsed.ip, mask)), els.network, 'network');
+                    break;
+                case 'C':
+                    copy(numberToIp(networkOf(lastParsed.ip, mask)) + '/' + lastParsed.prefix, els.input, 'cidr');
+                    break;
+                case 'b':
+                    if (!naMode) copy(numberToIp(broadcastOf(lastParsed.ip, mask)), els.broadcast, 'broadcast');
+                    break;
+                case 'h':
+                    copy(numberToIp(firstHostOf(lastParsed.ip, mask, lastParsed.prefix)), els.firstHost, 'first host');
+                    break;
+                case 'H':
+                    copy(numberToIp(lastHostOf(lastParsed.ip, mask, lastParsed.prefix)), els.lastHost, 'last host');
+                    break;
+                case 'm':
+                    copy(numberToIp(mask), els.dotSelect, 'mask');
+                    break;
+                case 'w':
+                    copy(numberToIp(wildcardOf(mask)), els.wildcard, 'wildcard');
+                    break;
+                case 'x':
+                    copy(toHex32(mask), els.hexmask, 'hex mask');
+                    break;
+            }
+        }
+
+        function showHelp(show) {
+            els.helpOverlay.classList.toggle('shown', show);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            // Esc always works (close overlays, blur).
+            if (e.key === 'Escape') {
+                if (els.helpOverlay.classList.contains('shown')) {
+                    showHelp(false);
+                    e.preventDefault();
+                    return;
+                }
+                if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                    document.activeElement.blur();
+                }
+                return;
+            }
+
+            const inInput = document.activeElement === els.input;
+
+            // '/' anywhere focuses the input (vim/google style).
+            if (e.key === '/' && !inInput) {
+                e.preventDefault();
+                els.input.focus();
+                els.input.select();
+                return;
+            }
+
+            // While typing in the input, leave everything else alone.
+            if (inInput) return;
+            // Modifier combos: leave for the browser (Ctrl+C/Cmd+C etc.).
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+            switch (e.key) {
+                case 'ArrowUp':    e.preventDefault(); stepSubnet( 1); break;
+                case 'ArrowDown':  e.preventDefault(); stepSubnet(-1); break;
+                case 'ArrowRight': e.preventDefault(); stepPrefix( 1); break;
+                case 'ArrowLeft':  e.preventDefault(); stepPrefix(-1); break;
+                case ']':          e.preventDefault(); stepPrefix( 1); break;
+                case '[':          e.preventDefault(); stepPrefix(-1); break;
+                case '?':          e.preventDefault(); showHelp(true); break;
+                case 'v':          e.preventDefault(); toggleVlsmList(); break;
+                case 'c': case 'C':
+                case 'b':
+                case 'h': case 'H':
+                case 'm':
+                case 'w':
+                case 'x':
+                    e.preventDefault();
+                    copyByKey(e.key);
+                    break;
+            }
+        });
+
+        // ---------- Wire up ----------
+        els.input.addEventListener('input',  update);
+        els.input.addEventListener('change', update);
+        els.slashSelect.addEventListener('change',  () => setPrefixFromSelect(els.slashSelect));
+        els.dotSelect.addEventListener('change',    () => setPrefixFromSelect(els.dotSelect));
+        els.usableSelect.addEventListener('change', () => setPrefixFromSelect(els.usableSelect));
+        els.vlsmPrefix.addEventListener('change', () => { renderVlsm(); els.vlsmList.classList.add('shown'); });
+
+        [els.firstHost, els.lastHost, els.network, els.broadcast,
+         els.wildcard, els.hexmask, els.binary].forEach(wireCopy);
+
+        els.helpOverlay.addEventListener('click', () => showHelp(false));
+
+        window.addEventListener('hashchange', () => {
+            suppressHashWrite = true;
+            if (readHash()) update();
+            suppressHashWrite = false;
+        });
+
+        generateDropdowns();
+        readHash();
+        update();
+
+        // ---------- Self-tests (run on load, log assertions to console) ----------
+        (function runTests() {
+            const fails = [];
+            function assertEq(actual, expected, label) {
+                if (actual !== expected) fails.push(label + ': expected ' + JSON.stringify(expected) + ', got ' + JSON.stringify(actual));
+            }
+
+            // Round-trip.
+            assertEq(numberToIp(ipToNumber('0.0.0.0')), '0.0.0.0', 'roundtrip 0.0.0.0');
+            assertEq(numberToIp(ipToNumber('255.255.255.255')), '255.255.255.255', 'roundtrip 255.255.255.255');
+            assertEq(numberToIp(ipToNumber('192.168.1.1')), '192.168.1.1', 'roundtrip 192.168.1.1');
+
+            // Prefix to mask.
+            assertEq(prefixToMask(0),  0,          '/0 mask');
+            assertEq(prefixToMask(8),  0xFF000000, '/8 mask');
+            assertEq(prefixToMask(24), 0xFFFFFF00, '/24 mask');
+            assertEq(prefixToMask(31), 0xFFFFFFFE, '/31 mask');
+            assertEq(prefixToMask(32), 0xFFFFFFFF, '/32 mask');
+
+            // /24 calculations.
+            const ip = ipToNumber('192.168.1.50');
+            const m24 = prefixToMask(24);
+            assertEq(numberToIp(networkOf(ip, m24)),         '192.168.1.0',   '/24 network');
+            assertEq(numberToIp(broadcastOf(ip, m24)),       '192.168.1.255', '/24 broadcast');
+            assertEq(numberToIp(firstHostOf(ip, m24, 24)),   '192.168.1.1',   '/24 first host');
+            assertEq(numberToIp(lastHostOf(ip, m24, 24)),    '192.168.1.254', '/24 last host');
+            assertEq(usableCount(24), 254, '/24 usable count');
+
+            // /30.
+            const m30 = prefixToMask(30);
+            assertEq(numberToIp(networkOf(ipToNumber('10.0.0.5'),   m30)), '10.0.0.4',   '/30 network');
+            assertEq(numberToIp(broadcastOf(ipToNumber('10.0.0.5'), m30)), '10.0.0.7',   '/30 broadcast');
+            assertEq(usableCount(30), 2, '/30 usable count');
+
+            // /31: point-to-point, no broadcast subtraction.
+            const m31 = prefixToMask(31);
+            assertEq(numberToIp(firstHostOf(ipToNumber('10.0.0.0'), m31, 31)), '10.0.0.0', '/31 first');
+            assertEq(numberToIp(lastHostOf (ipToNumber('10.0.0.0'), m31, 31)), '10.0.0.1', '/31 last');
+            assertEq(usableCount(31), 2, '/31 usable count');
+
+            // /32: single host.
+            const m32 = prefixToMask(32);
+            assertEq(numberToIp(firstHostOf(ipToNumber('10.0.0.7'), m32, 32)), '10.0.0.7', '/32 first');
+            assertEq(numberToIp(lastHostOf (ipToNumber('10.0.0.7'), m32, 32)), '10.0.0.7', '/32 last');
+            assertEq(usableCount(32), 1, '/32 usable count');
+
+            // /0: whole address space.
+            const m0 = prefixToMask(0);
+            assertEq(numberToIp(networkOf(ipToNumber('1.2.3.4'),   m0)), '0.0.0.0',         '/0 network');
+            assertEq(numberToIp(broadcastOf(ipToNumber('1.2.3.4'), m0)), '255.255.255.255', '/0 broadcast');
+
+            // Wildcard.
+            assertEq(numberToIp(wildcardOf(m24)), '0.0.0.255',   '/24 wildcard');
+            assertEq(numberToIp(wildcardOf(m0)),  '255.255.255.255', '/0 wildcard');
+            assertEq(numberToIp(wildcardOf(m32)), '0.0.0.0',     '/32 wildcard');
+
+            // Hex mask.
+            assertEq(toHex32(m24), '0xFFFFFF00', '/24 hex mask');
+            assertEq(toHex32(m0),  '0x00000000', '/0 hex mask');
+
+            // CIDR parsing edge cases.
+            assertEq(parse('192.168.0.0/24') !== null, true,  'parse valid /24');
+            assertEq(parse('256.0.0.0/24'),            null,  'parse invalid octet');
+            assertEq(parse('192.168.0.0/33'),          null,  'parse invalid prefix');
+            assertEq(parse('192.168.0.0'),             null,  'parse missing prefix');
+            assertEq(parse('not an ip'),               null,  'parse garbage');
+
+            if (fails.length) {
+                console.error('subcal: ' + fails.length + ' self-test failure(s):');
+                fails.forEach(f => console.error('  - ' + f));
+            } else {
+                console.log('subcal: all self-tests passed.');
+            }
+        })();
+    })();
+    </script>
 </body>
 
 </html>
